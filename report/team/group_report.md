@@ -69,11 +69,15 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 ### B2. Failure Analysis
 
-Lấy từ `results[*].result.failures` trong run JSON.
-
-| Case ID | Failure Type | Actual Tool Calls | What Failed | Fix |
+| Case ID | Failure Type | Actual Tool Calls | Failed | Fix |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| R03_web_news_routing | wrong_tool (observed: wrong_arg_value) | `lookup(query="AI news", topic="news", timeframe="day", max_results=5)` | `query`: expected `'AI'`, got `'AI news'` | Thêm mô tả về tool lookup |
+| R08_out_of_scope | out_of_scope (observed: unexpected_tool_call) | `send(text="Nguyên hàm của x^2 là x^3/3 + C...")` | Expected no tool call; model tự trả lời bài toán rồi gọi `send` (Telegram) | Thêm vào system prompt: Không trả lời câu hỏi ngoài phạm vi research/news |
+| R10_missing_handle | missing_info (observed: missing_tool_call) | `timeline(screenname="sama")` | Thiếu `clarify`; model đoán bừa handle `sama` | Thêm quy tắc: tuyệt đối không tự đoán người |
+| R11_missing_url | missing_info (observed: missing_tool_call) | `fetch(url="https://example.com/article")` | Thiếu `clarify`; model bịa URL placeholder | Thêm quy tắc cấm tự bịa/điền URL mẫu |
+| R12_confirm_before_send | wrong_boundary (observed: missing_tool_call) | `send(text="Bản tin này đã được đăng lên Telegram.")` | Thiếu `clarify(yes_no)`; model tự gọi `send` với nội dung bịa (chưa có bản tin, chưa xác nhận) | Thêm quy tắc: hành động ghi/gửi cần phải có xác minh từ user |
+| R13_parallel_web_and_tweets | wrong_tool (observed: wrong_arg_value) | `lookup(query="AI news", timeframe="day", max_results=5)` + `social_search(query="AI", search_type="Latest", limit=5)` | `lookup.query`: expected `'AI'`, got `'AI news'`; `lookup.topic`: expected `'news'`, got `None` (thiếu `topic`, kết quả trả về `general`) | Thêm mô tả về tool lookup |
+| R14_out_of_scope_coding | out_of_scope (observed: unexpected_tool_call) | `send(text="Dưới đây là một hàm Python tính số Fibonacci...")` | Expected no tool call; model viết code rồi gọi `send` (Telegram) | Thêm vào system prompt: Không trả lời câu hỏi ngoài phạm vi research/news |
 
 ### B3. Team Eval Cases
 
