@@ -60,7 +60,7 @@ h1 {font-size: 1.9rem !important; letter-spacing: -0.02em; margin-bottom: 0 !imp
 with st.sidebar:
     st.header("Cấu hình")
     provider_name = st.selectbox("Provider", PROVIDERS, index=0)
-    version = st.text_input("Version label", value="v3")
+    version = st.text_input("Version label", value="v4")
     model = st.text_input("Model (để trống = mặc định)", value="").strip() or None
     if st.button("Cuộc chat mới"):
         st.session_state.clear()
