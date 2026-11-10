@@ -71,9 +71,17 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 Lấy từ `results[*].result.failures` trong run JSON.
 
+Run v0: `starter_v0/runs/v0_B_base_openai_20261110T173124939840.json` (case_accuracy 0.65, 13/20). Cột Fix ghi version đầu tiên case này PASS (đối chiếu run v1 `v1_B_base_openai_20261110T183730315565.json`, v2 `v2_B_base_openai_20261110T194023990931.json`).
+
 | Case ID | Failure Type | Actual Tool Calls | What Failed | Fix |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| R03_web_news_routing | wrong_tool (mismatch: wrong_arg_value) | `lookup(query="AI news", topic="news", timeframe="day", max_results=5)` | Đúng tool, đúng topic/timeframe nhưng query thêm chữ "news" (`expected 'AI', got 'AI news'`). Liên quan: `tools.yaml` → `lookup` chỉ mô tả "Tra cứu thông tin trên internet", `topic` chỉ ghi "Phân loại". | PASS từ v1 (`system_prompt.md`) |
+| R08_out_of_scope | out_of_scope (mismatch: unexpected_tool_call) | `send(text="Nguyên hàm của x^2 là …")` | Câu toán ngoài phạm vi research, agent tự giải rồi gọi `send`. Liên quan: prompt không giới hạn phạm vi, có câu "Always finish the request in a single step. Pick one tool". | PASS từ v1 (`system_prompt.md`) |
+| R10_missing_handle | missing_info (mismatch: missing_tool_call) | `timeline(screenname="sama")` | Thiếu tên tài khoản, agent đoán Sam Altman thay vì `clarify`. Liên quan: prompt "do not ask them back — just make a sensible guess", "pick a well-known account like Sam Altman". | v1 đã gọi `clarify` nhưng thiếu `response_type="text"`; vẫn FAIL ở v2 |
+| R11_missing_url | missing_info (mismatch: missing_tool_call) | `fetch(url="https://example.com/article")` | Thiếu link, agent bịa URL thay vì `clarify`. Liên quan: prompt "assume a likely URL and read it". | v1 gọi `clarify` nhưng thiếu `response_type`; PASS từ v2 (`tools.yaml`) |
+| R12_confirm_before_send | wrong_boundary (mismatch: missing_tool_call) | `send(text="Bản tin này đã được đăng lên Telegram.")` | Gọi `send` ngay, không hỏi xác nhận yes/no. Liên quan: prompt "When the user wants to send, post, or publish something, just go ahead and do it"; `send` chỉ ghi "Gửi một đoạn văn bản đi.". | v1 gọi `clarify` nhưng hỏi nội dung/kênh, không phải `yes_no`; vẫn FAIL ở v2 |
+| R13_parallel_web_and_tweets | wrong_tool (mismatch: wrong_arg_value) | `lookup(query="AI news", timeframe="day", max_results=5)` + `social_search(query="AI", search_type="Latest", limit=5)` | Gọi đủ 2 tool nhưng `lookup` query "AI news" và thiếu `topic="news"`. Liên quan: như R03. | PASS từ v2 (`tools.yaml`) |
+| R14_out_of_scope_coding | out_of_scope (mismatch: unexpected_tool_call) | `send(text="…def fibonacci(n)…")` | Câu coding ngoài phạm vi, agent tự viết code rồi gọi `send`. Liên quan: như R08. | PASS từ v1 (`system_prompt.md`) |
 
 ### B3. Team Eval Cases
 
