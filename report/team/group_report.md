@@ -10,7 +10,7 @@
 
 - Tên nhóm: GroupT
 - Thành viên và phân công: xem [TEAM.md](../../TEAM.md)
-- Provider/model dùng cho v0–v3:
+- Provider/model dùng cho v0–v4: OpenAI `gpt-4o-mini` (`--provider openai`)
 
 ## 2. Mục tiêu và cách tiếp cận — PHẦN A: Giới thiệu agent
 
@@ -37,16 +37,29 @@ Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc 
 | Tên tool | Làm được gì | Tool mới nhóm thêm? |
 |---|---|---|
 | clarify | hỏi lại người dùng khi thiếu thông tin | không |
+| timeline | lấy tweet gần đây của một tài khoản X đã biết | không |
+| social_search | tìm tweet theo từ khoá / chủ đề | không |
+| lookup | tìm tin / thông tin trên web (Tavily), có topic và timeframe | không |
+| fetch | đọc nội dung một URL cụ thể (Firecrawl) | không |
+| format | trình bày item đã có thành bản tin markdown | không |
+| send | gửi nội dung lên Telegram, chỉ sau khi người dùng xác nhận | không (bonus có sẵn) |
+| policy | tra cứu policy nội bộ | không (bonus có sẵn) |
+| papers | tìm paper arXiv | không (bonus có sẵn) |
+| paper_text | lấy text PDF của paper arXiv | không (bonus có sẵn) |
 | deduplicate_news | gộp tin trùng theo URL chuẩn hoá hoặc mức độ từ chung trong tiêu đề | có |
-|  |  |  |
+| wiki_sum | lấy đoạn giới thiệu Wikipedia cho câu hỏi kiến thức nền "X là ai?" | có |
+| validate_url | kiểm tra định dạng URL, domain rút gọn và blacklist cục bộ | có |
+| date_localized | trả ngày giờ hiện tại theo timezone / thành phố | có |
 
 ### A3. Câu hỏi mẫu để thử
 
 > 3–5 câu hỏi/yêu cầu mẫu để team khác tự thử agent ngay.
 
-1.
-2.
-3.
+1. "Tin AI mới nhất tuần này là gì?" → `lookup`
+2. "Tóm tắt bài này giúp mình" rồi gửi link ở lượt sau → hỏi lại link, sau đó `fetch`
+3. "Bây giờ ở Tokyo là mấy giờ?" → `date_localized`
+4. "Ada Lovelace là ai?" → `wiki_sum`
+5. "Link https://bit.ly/ai-update có an toàn không?" → `validate_url`
 
 ## 3. Giải pháp
 
