@@ -16,32 +16,32 @@
 tools:
   # ---------------- Core tools ----------------
   - name: clarify
-    description: "Gửi một câu hỏi cho người dùng."
+    description: "Hỏi người dùng 1 câu để lấy thông tin còn thiếu, sau đó dừng và chờ họ trả lời. Dùng khi yêu cầu mơ hồ hoặc thiếu tham số bắt buộc (đối tượng, phạm vi, thời gian...). KHÔNG dùng khi đã đủ thông tin, hoặc để xác nhận lại điều người dùng đã nói rõ."
     parameters:
       type: object
       properties:
-        question: {type: string, default: "", description: "Câu hỏi"}
-        response_type: {type: string, enum: [text, yes_no, choice], default: "text", description: "Kiểu trả lời"}
-        options: {type: array, default: [], items: {type: string}, description: "Các lựa chọn"}
+        question: {type: string, default: "", description: "Một câu hỏi ngắn, cụ thể, hỏi đúng một thông tin còn thiếu. VD: 'Bạn muốn xem báo cáo của tháng nào?'"}
+        response_type: {type: string, enum: [text, yes_no, choice], default: "text", description: "Kiểu trả lời mong đợi. text: nhập tự do (mặc định). yes_no: câu hỏi đồng ý/không. choice: chọn trong 'options' (bắt buộc kèm options)."}
+        options: {type: array, default: [], items: {type: string}, description: "Chỉ dùng khi response_type='choice': 2-5 lựa chọn ngắn, không trùng nhau. Bỏ trống (hoặc []) với text và yes_no."}
       required: [question]
 
   - name: timeline
-    description: "Lấy các bài đăng gần đây."
+    description: "Lấy các tweet gần đây nhất của một tài khoản X (Twitter) cụ thể, mỗi tweet gồm nội dung, link, ngày đăng và số liệu tương tác (favorites, retweets, views). Dùng khi đã biết chính xác tài khoản cần xem. KHÔNG dùng để tìm tweet theo từ khóa/chủ đề hoặc khi chưa biết tài khoản (dùng social_search hoặc ask_user)."
     parameters:
       type: object
       properties:
-        screenname: {type: string, default: "", description: "Tên tài khoản"}
-        limit: {type: integer, default: 5, description: "Số lượng"}
+        screenname: {type: string, default: "", description: "Handle X của tài khoản, KHÔNG có ký tự '@', không phân biệt hoa thường. VD: 'elonmusk', không phải '@elonmusk' hay tên hiển thị."}
+        limit: {type: integer, default: 5, description: "Số tweet trả về, từ 1 đến 50. Mặc định 5; chỉ tăng khi người dùng yêu cầu xem nhiều hơn. Chỉ cắt bớt kết quả API, không yêu cầu API trả thêm."}
       required: [screenname]
 
   - name: social_search
-    description: "Tìm trên mạng xã hội."
+    description: "Tìm tweet công khai trên X (Twitter) theo từ khóa, hashtag hoặc chủ đề, mỗi tweet gồm nội dung, link, ngày đăng và số liệu tương tác (favorites, retweets, views). Dùng khi cần tìm thảo luận/nội dung về một chủ đề hoặc sự kiện mà chưa biết tài khoản cụ thể. KHÔNG dùng khi đã biết tài khoản cần xem (dùng get_user_tweets) hoặc khi yêu cầu còn mơ hồ (dùng ask_user)."
     parameters:
       type: object
       properties:
-        query: {type: string, default: "", description: "Từ khóa"}
-        search_type: {type: string, enum: [Latest, Top], default: "Latest", description: "Cách sắp xếp"}
-        limit: {type: integer, default: 5, description: "Số lượng"}
+        query: {type: string, default: "", description: "Từ khóa tìm kiếm, ngắn gọn 1-6 từ, có thể kèm hashtag hoặc cụm từ trong ngoặc kép. Hỗ trợ toán tử của X: 'from:handle' (tweet của tài khoản), 'since:YYYY-MM-DD' / 'until:YYYY-MM-DD' (khung thời gian). VD: 'AI agent since:2026-11-01', '#tintuc from:vnexpress'."}
+        search_type: {type: string, enum: [Latest, Top], default: "Latest", description: "Cách sắp xếp kết quả. Latest: mới nhất trước (mặc định, dùng cho tin nóng, diễn biến hiện tại). Top: nhiều tương tác nhất (dùng để tìm tweet nổi bật, ý kiến phổ biến). Viết hoa chữ cái đầu đúng như enum."}
+        limit: {type: integer, default: 5, description: "Số tweet trả về, từ 1 đến 50. Mặc định 5; chỉ tăng khi người dùng yêu cầu xem nhiều hơn. Chỉ cắt bớt kết quả API, không yêu cầu API trả thêm."}
       required: [query]
 
   - name: lookup
