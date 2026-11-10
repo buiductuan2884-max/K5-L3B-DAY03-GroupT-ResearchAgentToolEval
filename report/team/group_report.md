@@ -163,10 +163,34 @@ Chi tiết đóng góp của từng thành viên nằm trong [TEAM.md](../../TEA
 
 ## 7. Hạn chế và hướng cải thiện — B6. Reflection
 
-- Fix nào thuộc `system_prompt.md`?
-- Fix nào thuộc `tools.yaml`?
-- Failure nào cần review thủ công thay vì chấm tự động?
-- Nếu có thêm một vòng, nhóm sẽ thử giả thuyết nào?
+Run dùng để đối chiếu: v0 `starter_v0/runs/v0_B_base_openai_20261110T173124939840.json`, v1 `…/v1_B_base_openai_20261110T183730315565.json`, v2 `…/v2_B_base_openai_20261110T194023990931.json`, v3 `…/v3_B_base_openai_20261110T220531642617.json`.
+
+**Fix nào thuộc `system_prompt.md`?**
+
+Các fix sửa được là R08, R14: ở v0, agent tự giải/viết code rồi gọi `send` để gửi kết quả. Nguyên do trực tiếp là câu “Always finish the request in a single step. Pick one tool” trong system prompt v0. Ở v1, prompt cho phép không gọi tool và đặt quy tắc ở `system_prompt.md:6-8`.
+
+Tuy nhiên có tác dụng phụ: v1 làm M02 tụt. Agent ở v1 gọi `social_search(query="robotics")` thay vì `lookup` cho câu hỏi tiếp nối “còn về robotics thì sao?”. v2 sửa lại bằng mô tả `lookup` trong `tools.yaml`.
+
+**Fix nào thuộc `tools.yaml`?**
+
+Các fix thuộc về tool là R13, R11, R10.
+- R13 (sửa ở v2): v1 gọi `lookup(query="AI news")` và thiếu `topic`. Ở v2, mô tả `query` ghi “KHÔNG thêm chữ ‘news’…” và mô tả `topic` ghi “‘news’ khi người dùng hỏi tin tức”.
+- R11 (sửa ở v2): v1 gọi `clarify` nhưng thiếu `response_type`. Mô tả `fetch` ở v2 ghi “gọi clarify với response_type='text'… không bịa URL” (`tools.yaml:71`).
+- R10 (sửa ở v3): v2 vẫn thiếu `response_type`. Ở v3, An đặt `required: [question, response_type]` (`tools.yaml:26`).
+
+Ngoài ra, từ v1 `clarify` đã được gọi đúng tool mà vẫn FAIL chỉ vì thiếu tham số. Vậy có thể nói prompt đã sửa đúng hướng, phần còn thiếu nằm ở khai báo tool.
+
+**Failure nào cần review thủ công thay vì chấm tự động?**
+
+R04, M03 và B4.
+- R04 (PASS): agent gọi `fetch(url="https://openai.com/blog/gpt-5")`, nhưng `tool_results` trong run v0 và v3 cho thấy trang trả về “# 404”. Eval chỉ so tên tool và tham số (`run_eval.py:142`, `evaluate_phase_b`), không kiểm tra nội dung tool trả về.
+- M03: có thể do đáp án chặt — agent trả `screenname="andrejkarpathy"`, đáp án là `karpathy`. Để biết `andrejkarpathy` có phải tài khoản thật hay không vẫn phải kiểm tra bằng tay.
+- B4: lượt 2 và 4 cho thấy agent hỏi lại bằng câu chữ, không gọi `clarify` (`starter_v0/transcripts/v3_openai_20261110T222531182603.transcript.json`). Với người dùng trực tiếp thì hành vi này ổn, nhưng eval sẽ chấm FAIL.
+
+**Nếu có thêm một vòng, nhóm sẽ thử giả thuyết nào?**
+
+- R12 lỗi ở cả 4 version (agent hỏi nội dung cụ thể cần đăng thay vì hỏi yes/no). Giả thuyết: ghi rõ rằng gặp yêu cầu gửi/đăng thì luôn gọi `clarify(response_type="yes_no")` trước, kể cả khi chưa có nội dung. Khả năng cao lỗi do prompt đang tự mâu thuẫn: `system_prompt.md:8` cho phép đi tiếp “only if the user has clearly specified the content and destination”, trong khi `tools.yaml:110` ghi `send` chỉ dùng khi đã có “một nội dung cụ thể”.
+- M03: đổi mô tả để dùng “handle ngắn”, vì mô tả `screenname` ở v3 là “Tên đẩy đủ tài khoản X” (`tools.yaml:33`); chữ “đầy đủ” có thể đẩy model chọn tên dài hơn bình thường.
 
 ## 8. Tài liệu tham khảo
 
