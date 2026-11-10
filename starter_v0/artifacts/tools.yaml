@@ -84,11 +84,12 @@ tools:
         headline: {type: string, default: "", description: "Tiêu đề"}
       required: [items, template]
 
-# ---------------- Bonus tools ----------------
+  # ---------------- Bonus tools ----------------
+
   - name: send
     description: >-
       Gửi nội dung văn bản lên Telegram thông qua bot.
-      Chỉ sử dụng khi người dùng yêu cầu gửi hoặc đăng một nội dung cụ thể
+      CHỈ sử dụng khi người dùng yêu cầu gửi hoặc đăng một nội dung cụ thể
       và đã xác nhận rõ ràng việc gửi nội dung đó.
       Nếu chưa xác nhận, phải gọi tool clarify với response_type=yes_no
       để hỏi người dùng trước.
