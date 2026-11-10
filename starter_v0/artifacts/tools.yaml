@@ -26,7 +26,7 @@ tools:
       required: [question]
 
   - name: timeline
-    description: "Lấy các tweet gần đây nhất của một tài khoản X (Twitter) cụ thể, mỗi tweet gồm nội dung, link, ngày đăng và số liệu tương tác (favorites, retweets, views). Dùng khi đã biết chính xác tài khoản cần xem. KHÔNG dùng để tìm tweet theo từ khóa/chủ đề hoặc khi chưa biết tài khoản (dùng social_search hoặc ask_user)."
+    description: "Lấy các tweet gần đây nhất của một tài khoản X (Twitter) cụ thể, mỗi tweet gồm nội dung, link, ngày đăng và số liệu tương tác (favorites, retweets, views). Dùng khi đã biết chính xác tài khoản cần xem. KHÔNG dùng để tìm tweet theo từ khóa/chủ đề hoặc khi chưa biết tài khoản (dùng social_search hoặc clarify)."
     parameters:
       type: object
       properties:
@@ -35,7 +35,7 @@ tools:
       required: [screenname]
 
   - name: social_search
-    description: "Tìm tweet công khai trên X (Twitter) theo từ khóa, hashtag hoặc chủ đề, mỗi tweet gồm nội dung, link, ngày đăng và số liệu tương tác (favorites, retweets, views). Dùng khi cần tìm thảo luận/nội dung về một chủ đề hoặc sự kiện mà chưa biết tài khoản cụ thể. KHÔNG dùng khi đã biết tài khoản cần xem (dùng get_user_tweets) hoặc khi yêu cầu còn mơ hồ (dùng ask_user)."
+    description: "Tìm tweet công khai trên X (Twitter) theo từ khóa, hashtag hoặc chủ đề, mỗi tweet gồm nội dung, link, ngày đăng và số liệu tương tác (favorites, retweets, views). Dùng khi cần tìm thảo luận/nội dung về một chủ đề hoặc sự kiện mà chưa biết tài khoản cụ thể. KHÔNG dùng khi đã biết tài khoản cần xem (dùng timeline) hoặc khi yêu cầu còn mơ hồ (dùng clarify)."
     parameters:
       type: object
       properties:
