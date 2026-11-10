@@ -85,9 +85,20 @@ Run v0: `starter_v0/runs/v0_B_base_openai_20261110T173124939840.json` (case_accu
 
 Liệt kê đúng 10 case trong `starter_v0/data/eval_group.json` (5 single turn + 5 multi turn).
 
+Run: `starter_v0/runs/v4_B_group_openai_20261111T000014139367.json` (v4, gpt-4o-mini): case_accuracy 0.6 (6/10), routing 0.8, multiturn 0.4, provider_error_cases 0.
+
 | Case ID | What It Tests | Expected Tool/Behavior | Result |
 |---|---|---|---|
-|  |  |  |  |
+| G01_wikipedia_knowledge_summary | Câu hỏi 'X là ai?' về kiến thức nền → wiki_sum, không phải lookup tin tức. | `wiki_sum(title='Ada Lovelace')` | FAIL: title: expected 'Ada Lovelace', got 'Ada_Lovelace' |
+| G02_validate_shortened_link | Hỏi trực tiếp kiểm tra một URL → validate_url; kết quả cần được diễn giải thận trọng, không khẳng định an toàn tuyệt đối. | `validate_url(url='https://bit.ly/ai-update')` | PASS |
+| G03_direct_local_time | Hỏi trực tiếp giờ hiện tại tại thành phố → date_localized với timezone IANA; không dùng tra cứu web. | `date_localized(timezone='America/Los_Angeles')` | PASS |
+| G04_today_news_uses_lookup | Từ 'hôm nay' trong câu hỏi tìm tin yêu cầu lookup timeframe=day, không dùng date_localized. | `lookup(query='AI', topic='news', timeframe='day')` | PASS |
+| G05_specific_article_uses_fetch | Đã có URL và yêu cầu đọc/tóm tắt thì gọi fetch trực tiếp, không gọi validate_url trước. | `fetch(url='https://openai.com/research/')` | PASS |
+| G06_multiturn_time_location | Nhiều lượt làm rõ địa điểm; lượt cuối yêu cầu giờ hiện tại và phải truyền đúng timezone Tokyo. | `date_localized(timezone='Asia/Tokyo')` | PASS |
+| G07_multiturn_url_validation | Lấy URL từ lượt trước để kiểm tra ở lượt hiện tại; không fetch link. | `validate_url(url='https://tinyurl.com/example-check')` | FAIL: extra tool call validate_url |
+| G08_multiturn_wikipedia_followup | Yêu cầu lượt cuối chỉ rõ nguồn Wikipedia; dùng wiki_sum cho kiến thức nền, không dùng lookup. | `wiki_sum(title='Alan Turing')` | FAIL: title: expected 'Alan Turing', got 'Alan_Turing' |
+| G09_multiturn_news_topic_correction | Giữ timeframe=day từ ngữ cảnh, dùng chủ đề đã sửa robotics và route qua lookup. | `lookup(query='robotics', topic='news', timeframe='day')` | PASS |
+| G10_multiturn_publish_confirmation | Dù có nội dung và đích đến, yêu cầu chỉ hỏi xác nhận nghĩa là chưa cho phép gửi; không gọi send, phải xác nhận trước. | `clarify(response_type='yes_no')` | FAIL: missing tool call clarify; extra tool call format |
 
 ### B4. Live Chat Evidence
 
@@ -119,7 +130,7 @@ Chỉ điền nếu nhóm làm bonus (ghi riêng, tối đa 10 điểm). Tool c�
 | Bonus | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
 | Small Local Model | xem B7 |  |  |
-| Hơn 3 tool mới (≥ 4) |  |  |  |
+| Hơn 3 tool mới (≥ 4) | `starter_v0/tools/{deduplicate_news,wiki_sum,validate_url,date_localized}/`, `tests/test_tools_todo.py` (4+3+3+3 test) | Cả 4 tool đăng ký trong `tools/__init__.py` và khai báo trong `tools.yaml`; `pytest`: 95 passed, 0 failed; base v4 giữ 0.9 | `validate_url` chỉ kiểm tra cục bộ (định dạng, domain rút gọn, blacklist `URL_BLACKLIST_DOMAINS`), không quét mã độc |
 | `send` gửi thật lên Telegram sau xác nhận | transcript |  |  |
 | Test challenge (0 skipped / regression test) | `pytest` output |  |  |
 
