@@ -2,17 +2,19 @@
 
 ## Thông tin nhóm
 
-- Tên nhóm:
-- Lớp: L3A / L3B
-- Repo nhóm: `K5-L3A-DAY03-TenNhom-ResearchAgentToolEval` hoặc `K5-L3B-DAY03-TenNhom-ResearchAgentToolEval` (xem [SUBMISSION.md](SUBMISSION.md))
-- URL repo, nhánh nộp, commit chốt:
+- Tên nhóm: GroupT
+- Lớp: L3B
+- Repo nhóm: `K5-L3B-DAY03-GroupT-ResearchAgentToolEval` (xem [SUBMISSION.md](SUBMISSION.md))
+- URL repo, nhánh nộp, commit chốt: https://github.com/buiductuan2884-max/K5-L3B-DAY03-GroupT-ResearchAgentToolEval, `main`, commit chốt:
 
 ## Thành viên
 
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
-|   1 |        |      |       |        |         |
-|   2 |        |      |       |        |         |
+|   1 | Bùi Đức Tuấn | 2A202603902 |       | buiductuan2884-max | Nhóm trưởng |
+|   2 | Hoàng Đức An |      |       | katogithub2701 |         |
+|   3 |        |      |       | NMCcg  |         |
+|   4 |        |      |       | VThanh-Huy |         |
 
 ## Cá nhân
 
