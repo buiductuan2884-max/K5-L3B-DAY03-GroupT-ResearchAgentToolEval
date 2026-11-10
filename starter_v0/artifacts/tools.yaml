@@ -45,26 +45,44 @@ tools:
       required: [query]
 
   - name: lookup
-    description: "Tra cứu thông tin trên internet."
+    description: >-
+      Tìm kiếm trên web (Tavily), trả về danh sách bài {title, url, source, summary}.
+      DÙNG khi người dùng hỏi tin tức / thông tin trên web về một chủ đề (vd "tin AI hôm nay",
+      "tin công nghệ tuần này", "tìm trên web về OpenAI"). Câu nối tiếp sau một câu hỏi tin web
+      (vd "còn về robotics thì sao?") vẫn dùng lookup với chủ đề mới, giữ topic và timeframe cũ.
+      KHÔNG dùng khi: người dùng đã đưa link cụ thể (dùng fetch); hỏi tweet / mọi người bàn gì
+      trên Twitter (dùng social_search hoặc timeline); hỏi paper arXiv (dùng papers); hỏi
+      policy công ty (dùng policy); câu ngoài phạm vi research (không gọi tool).
     parameters:
       type: object
       properties:
-        query: {type: string, default: "", description: "Truy vấn"}
-        topic: {type: string, enum: [general, news], default: "general", description: "Phân loại"}
-        timeframe: {type: string, enum: [day, week, month, year], default: "week", description: "Khoảng thời gian"}
-        max_results: {type: integer, default: 5, description: "Số kết quả"}
+        query: {type: string, default: "", description: "Chủ đề cần tìm, chỉ gồm từ khóa chủ đề (vd 'AI', 'robotics', 'OpenAI'). KHÔNG thêm các chữ 'news', 'tin tức', 'hôm nay' vào query — loại tin và thời gian đã có topic và timeframe."}
+        topic: {type: string, enum: [general, news], default: "general", description: "'news' khi người dùng hỏi tin tức / thời sự / tin mới; 'general' cho tra cứu thông tin chung."}
+        timeframe: {type: string, enum: [day, week, month, year], default: "week", description: "Khoảng thời gian: 'hôm nay' -> day, 'tuần này' -> week, 'tháng này' -> month, 'năm nay' -> year. Giữ nguyên timeframe của lượt trước nếu người dùng không đổi."}
+        max_results: {type: integer, default: 5, description: "Số kết quả (số nguyên, mặc định 5)."}
       required: [query]
 
   - name: fetch
-    description: "Lấy nội dung từ một địa chỉ."
+    description: >-
+      Đọc nội dung của MỘT URL cụ thể (Firecrawl), trả về markdown tối đa 4000 ký tự.
+      DÙNG khi người dùng đã đưa link đầy đủ (http/https) trong tin nhắn hoặc ở lượt trước và
+      muốn đọc / tóm tắt nó. Nhiều link thì gọi fetch một lần cho mỗi link.
+      KHÔNG dùng khi: chưa có link ("tóm tắt bài này" mà không kèm URL) — gọi clarify với
+      response_type="text" để xin link, TUYỆT ĐỐI không tự đoán hay bịa URL; cần tìm bài theo chủ đề (dùng lookup);
+      link là paper arXiv cần lấy text (dùng paper_text).
     parameters:
       type: object
       properties:
-        url: {type: string, default: "", description: "Địa chỉ"}
+        url: {type: string, default: "", description: "URL đầy đủ, chép nguyên văn từ người dùng (vd 'https://openai.com/blog/gpt-5'). Không sửa, không đoán."}
       required: [url]
 
   - name: format
-    description: "Trình bày dữ liệu đã có thành văn bản."
+    description: >-
+      Trình bày các item ĐÃ CÓ (kết quả từ lookup, fetch, timeline, social_search, papers...)
+      thành bản tin markdown. Tool này không tìm hay đọc dữ liệu mới.
+      DÙNG khi đã có item và người dùng muốn làm bản tin / digest / thread.
+      KHÔNG dùng khi: chưa có dữ liệu (gọi tool lấy dữ liệu trước); chỉ trả lời một câu hỏi
+      ngắn; muốn gửi đi (format xong, gửi bằng send sau khi người dùng xác nhận).
     parameters:
       type: object
       properties:
@@ -80,18 +98,25 @@ tools:
               source: {type: string}
               summary: {type: string}
               section: {type: string}
-        template: {type: string, enum: [brief, sections, bullets, thread, daily_ai_vn], default: "sections", description: "Khuôn"}
-        headline: {type: string, default: "", description: "Tiêu đề"}
+        template: {type: string, enum: [brief, sections, bullets, thread, daily_ai_vn], default: "sections", description: "Khuôn: brief = tối đa 5 gạch đầu dòng có tiêu đề; sections = nhóm theo field section; bullets = danh sách phẳng; thread = đánh số 1/, 2/...; daily_ai_vn = bản tin AI tiếng Việt nhóm theo section."}
+        headline: {type: string, default: "", description: "Tiêu đề bản tin (tuỳ chọn)."}
       required: [items, template]
 
   # ---------------- Bonus tools ----------------
   - name: send
-    description: "Gửi một đoạn văn bản đi."
+    description: >-
+      Gửi (đăng) một đoạn văn bản lên Telegram channel riêng của nhóm. Đây là HÀNH ĐỘNG GHI,
+      không hoàn tác được.
+      CHỈ gọi khi người dùng đã xác nhận rõ ràng ("ok gửi đi", "có") cho đúng nội dung đó ở
+      lượt trước, và truyền confirmed=true.
+      KHÔNG dùng khi: người dùng mới yêu cầu đăng/gửi mà chưa xác nhận — gọi clarify với
+      response_type=yes_no để hỏi xác nhận trước; để trả lời câu hỏi; với nội dung ngoài phạm vi
+      research (bài toán, code...).
     parameters:
       type: object
       properties:
-        text: {type: string, default: "", description: "Nội dung"}
-        confirmed: {type: boolean, default: false, description: "Cờ xác nhận"}
+        text: {type: string, default: "", description: "Đúng nội dung người dùng đã xác nhận sẽ gửi."}
+        confirmed: {type: boolean, default: false, description: "true CHỈ khi người dùng đã xác nhận rõ ràng nội dung này; chưa xác nhận thì không gọi send."}
       required: [text]
 
   - name: policy
