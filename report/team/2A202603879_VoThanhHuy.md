@@ -43,4 +43,3 @@ Qua bài lab này, hiểu rõ hơn cách một AI Agent lựa chọn và gọi c
 Học được cách chạy Unit Test, đọc kết quả Eval và phân biệt lỗi của model với lỗi API.
 
 Cần tìm hiểu thêm cách viết System Prompt, thiết kế Tool Calling và cải thiện việc xử lý các trường hợp đặc biệt.
-D:\Document_D\Vin_AI\K5-L3B-DAY03-GroupT-ResearchAgentToolEval\report\team\2A202603879_VoThanhHuy.md
