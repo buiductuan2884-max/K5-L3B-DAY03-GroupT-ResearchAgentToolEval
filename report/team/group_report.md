@@ -66,6 +66,10 @@ Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc 
 > Tóm tắt các thay đổi chính trong `starter_v0/artifacts/system_prompt.md` và `starter_v0/artifacts/tools.yaml`, và tool mới nhóm viết (tên, làm gì, khi nào agent nên gọi).
 
 - Thêm `deduplicate_news`, tool xử lý cục bộ để gộp tin trùng khi người dùng có ít nhất hai tin từ các nguồn và muốn loại bỏ trùng lặp. Tool chuẩn hoá URL trước, sau đó so các từ trong tiêu đề; nguồn được gộp và summary dài hơn được giữ lại. Dùng trước `format`, không dùng để tìm tin mới hoặc tóm tắt một bài.
+- **v1, `system_prompt.md`** (Hoàng): bỏ 3 câu của baseline ép agent tự đoán khi thiếu thông tin, "cứ gửi luôn" và "chỉ chọn một tool"; thay bằng quy tắc: thiếu thông tin thì hỏi lại, gửi/đăng phải được xác nhận, được không gọi tool hoặc gọi nhiều bước, không bịa tham số (`system_prompt.md:6-8`). Base 0.65 → 0.75.
+- **v2, `tools.yaml`** (Hoàng: `clarify`, `timeline`, `social_search`; Tuấn: `lookup`, `fetch`, `format`; Thanh: `send`, `policy`, `papers`, `paper_text`): viết lại mô tả 10 tool theo dạng DÙNG khi / KHÔNG DÙNG khi, kèm ví dụ tham số (vd `lookup.query` chỉ gồm từ khoá, `topic="news"` khi hỏi tin; `fetch` không có link thì gọi `clarify` text; `send` phải hỏi `clarify` yes_no trước). Base 0.75 → 0.85.
+- **v3, `tools.yaml`** (Hoàng): `clarify` bắt buộc `response_type` và mô tả khi nào dùng `yes_no`; sửa mô tả `screenname` của `timeline`. Base 0.85 → 0.90.
+- **v4, tool mới** (Cường, khai báo `deduplicate_news`: Tuấn): thêm `wiki_sum` (câu hỏi kiến thức nền "X là ai?"), `validate_url` (khi người dùng hỏi một link có hợp lệ/an toàn không), `date_localized` (khi hỏi trực tiếp giờ/ngày ở một nơi), khai báo trong `tools.yaml` và thêm 1 đoạn routing cho chúng trong `system_prompt.md:10`. Base giữ 0.90, group 0.60.
 
 ## 4. Kết quả — PHẦN B: Chi tiết và bằng chứng
 
@@ -131,10 +135,10 @@ Transcript: `starter_v0/transcripts/v3_openai_20261110T222531182603.transcript.j
 | Item | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
 | Tool mới (`tools/<tên>/`) | `starter_v0/tools/deduplicate_news/` | URL chuẩn hoá và tiêu đề tương tự được gộp; không gọi API | Không tìm tin mới; chỉ gộp khi URL trùng hoặc ngưỡng từ chung đạt 0.8 |
-| Unit test tool mới (≥ 3 test/tool) | `starter_v0/tests/test_tools_todo.py` | 4 test cho URL, tiêu đề, input sai và ngưỡng sai; toàn bộ suite: 71 passed, 0 failed | 14 test TODO cũ của các tool khác vẫn skipped |
+| Unit test tool mới (≥ 3 test/tool) | `starter_v0/tests/test_tools_todo.py` | 13 test cho 4 tool mới: `deduplicate_news` 4 (URL, tiêu đề, input sai, ngưỡng sai), `wiki_sum` 3, `validate_url` 3, `date_localized` 3; toàn bộ suite: 95 passed, 0 failed | 14 test TODO mẫu của các tool có sẵn vẫn skipped |
 | UI (lệnh chạy + link dùng thử) | `starter_v0/app.py`, `streamlit run app.py`, https://coast-gray-injured-hoping.trycloudflare.com | Dùng lại `run_model_tool_loop` của `chat.py`; mỗi lần gọi tool hiện args + kết quả; transcript lưu `transcripts/*_ui_*.transcript.json` | Lỗi tool/provider hiện ra (✗, `st.error`), không bị giấu; câu mẫu không có lệnh gửi |
 
-Tool unit tests: số test đã viết, và một ví dụ lỗi mà unit test bắt được nhưng eval không bắt được.
+Tool unit tests: 13 test cho 4 tool mới (`starter_v0/tests/test_tools_todo.py`). Ví dụ unit test bắt được mà eval không bắt được: `test_deduplicate_news_returns_error_for_invalid_threshold` kiểm tra ngưỡng ngoài (0, 1] trả error dict; eval chỉ so tên tool và tham số nên không bao giờ chạy tới nhánh này. Chiều ngược lại cũng có: lỗi `403` của `wiki_sum` không unit test nào bắt (test dùng `fake_http`) và eval cũng không bắt (eval không kiểm tra nội dung tool trả về).
 
 ### B5. Bonus Evidence
 
@@ -142,16 +146,16 @@ Chỉ điền nếu nhóm làm bonus (ghi riêng, tối đa 10 điểm). Tool c�
 
 | Bonus | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
-| Small Local Model | xem B7 |  |  |
+| Small Local Model | Không làm | — | — |
 | Hơn 3 tool mới (≥ 4) | `starter_v0/tools/{deduplicate_news,wiki_sum,validate_url,date_localized}/`, `tests/test_tools_todo.py` (4+3+3+3 test) | Cả 4 tool đăng ký trong `tools/__init__.py` và khai báo trong `tools.yaml`; `pytest`: 95 passed, 0 failed; base v4 giữ 0.9 | `validate_url` chỉ kiểm tra cục bộ (định dạng, domain rút gọn, blacklist `URL_BLACKLIST_DOMAINS`), không quét mã độc. `wiki_sum` gọi thật bị Wikipedia trả `403 Forbidden` vì request thiếu `User-Agent` (`starter_v0/tools/wiki_sum/tool.py:20-22`; bằng chứng: `tool_results` của G01, G08 trong `runs/v4_B_group_openai_20261111T000014139367.json`); unit test dùng `fake_http` nên không bắt được (leader kiểm chứng) |
-| `send` gửi thật lên Telegram sau xác nhận | transcript |  |  |
-| Test challenge (0 skipped / regression test) | `pytest` output |  |  |
+| `send` gửi thật lên Telegram sau xác nhận | Không làm (chưa cấu hình `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`) | Lượt 4 trong B4: agent hỏi xác nhận, không gọi `send` | `send` từ chối khi `confirmed=false` (`tools/send/tool.py:12`) |
+| Test challenge (0 skipped / regression test) | Không làm (`pytest`: 95 passed, 14 skipped) | — | — |
 
-Test challenge: số bug tìm được trong tool có sẵn (nếu có), cách sửa, và test regression tương ứng.
+Test challenge: nhóm không làm.
 
 ### B7. Small Local Model Challenge (bonus)
 
-Chỉ điền nếu nhóm làm bonus này.
+Nhóm không làm bonus này (không chạy model local / Ollama).
 
 | Version | Model (provider) | Prompt/Tools | case_accuracy | tool_routing | argument | multiturn | Run File |
 |---|---|---|---|---|---|---|---|
@@ -179,7 +183,14 @@ Lỗi đặc thù của model nhỏ (đếm từ run JSON):
 
 > Khó khăn chính và cách nhóm xử lý. Nếu gặp lỗi kỹ thuật (provider lỗi, hết quota API, tool không chạy), mô tả lỗi và dẫn bằng chứng: run JSON, log, ảnh chụp.
 
--
+- **Provider:** không có `OPENROUTER_API_KEY`; README cho phép đổi provider nên nhóm chạy toàn bộ v0–v4 bằng OpenAI `gpt-4o-mini` (`--provider openai`).
+- **Windows chặn thư viện:** Windows Application Control chặn file DLL của `jiter 0.19.0` (phụ thuộc của SDK `openai`) nên không chạy được eval. Cách xử lý: cài `jiter==0.18.0` trong `.venv`.
+- **Hash artifact lệch giữa đĩa và commit:** git (`core.autocrlf=true`) đổi xuống dòng LF → CRLF khi checkout, làm `tools_hash` trên đĩa (`72a531d55085`) khác hash của run v2 (`0207b8d17077`) dù nội dung giống nhau. Cách xử lý: ghi lại file đúng byte từ commit (`git show HEAD:<file>`) và kiểm tra `versioning.file_hash` trước mỗi lần chạy eval.
+- **Merge nhánh tách từ code cũ:** các nhánh thành viên tách ra trước khi có v1/v2, diff trực tiếp với `main` trông như xoá hàng nghìn dòng. Cách xử lý: merge 3-way, chỉ gỡ đúng các đoạn xung đột (vd `send` ở v2, `social_search` ở v3, TEAM.md/`tools.yaml` ở v4) và giữ phần của từng người.
+- **Tên tool sai trong mô tả:** mô tả `timeline`/`social_search` nhắc tới `ask_user`, `get_user_tweets` (tên hàm Python) thay vì tên tool `clarify`, `timeline`; sửa ở commit `c1916d4` trước khi chạy v2.
+- **UI:** (1) `chat.py` in emoji ra stdout, console Windows cp1252 làm lượt chat có tool bị lỗi `UnicodeEncodeError`; sửa bằng `sys.stdout.reconfigure(encoding="utf-8")` trong `app.py`. (2) Sau khi thêm tool mới, UI báo `unknown_tool` cho `date_localized` vì Streamlit giữ module `tools` đã import; restart server là hết.
+- **Tool gọi thật bị lỗi:** `wiki_sum` bị Wikipedia trả `403 Forbidden` (thiếu `User-Agent`), xem phân tích G01/G08 ở B3. Chưa sửa.
+
 
 ## 6. Tổng hợp đóng góp
 
@@ -218,4 +229,8 @@ R04, M03 và B4.
 
 ## 8. Tài liệu tham khảo
 
--
+- Đề bài và repo gốc: https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval (`README.md`, `RULES.md`, `RUBRIC.md`, `SUBMISSION.md`, `CHECKPOINTS.md`)
+- Wikipedia REST API (endpoint `page/summary`) dùng trong `wiki_sum`: https://en.wikipedia.org/api/rest_v1/
+- Streamlit (UI): https://docs.streamlit.io/
+- Cloudflare quick tunnel (link dùng thử UI): https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/trycloudflare/
+- Công cụ AI dùng hỗ trợ code/phân tích log: ghi trong báo cáo cá nhân của từng thành viên.

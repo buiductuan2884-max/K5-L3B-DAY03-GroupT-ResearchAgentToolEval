@@ -25,6 +25,27 @@ report/team/2A202603904_NguyenManhCuong.md
 
 Sao chép mục dưới đây cho từng thành viên.
 
+## BuiDucTuan-2A202603902
+
+### Phần việc phụ trách
+
+- Nhóm trưởng: fork repo, chia việc, review và merge nhánh của các thành viên vào `main`
+- CP1: chạy baseline v0 và ghi `version_log.csv`
+- CP2: viết lại mô tả `lookup`, `fetch`, `format` trong `tools.yaml` (v2); chạy eval v1–v4
+- CP5: UI Streamlit (`starter_v0/app.py`), link dùng thử qua Cloudflare Tunnel, chat live `chat.py` (B4)
+- Báo cáo nhóm: B1, B2 (bản nháp), B4, B6 và các mục dữ kiện
+
+### Đóng góp cụ thể
+
+- Baseline v0 (0.65) và các run base v1, v2, v3 (0.90), v4 (0.90), group v4 (0.60), tất cả `provider_error_cases == 0`
+- Merge 3-way các nhánh `hoangducan`, `ThanhHuy` (phần v2), `nguyenmanhcuong`; khai báo `deduplicate_news` trong `tools.yaml`
+- UI Streamlit dùng lại `run_model_tool_loop` của `chat.py`, hiện từng lần gọi tool (args + kết quả, lỗi hiện ✗), lưu transcript; sửa lỗi `UnicodeEncodeError` trên Windows
+- Transcript chat live 4 lượt (`starter_v0/transcripts/v3_openai_20261110T222531182603.transcript.json`)
+
+### Bằng chứng
+
+- Commit trên `main`: `4bb6dac` (v0), `f239a1c` + `0b7cb18` (v2), `d4bfb40` (v3), `a68630d` (v4 + group), `511f239` (UI), `814a3d0` (B4), `a8d57c9` (B6)
+
 ## HoangDucAn-2A202603800
 
 ### Phần việc phụ trách
