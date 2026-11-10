@@ -12,7 +12,7 @@
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
 |   1 | Bùi Đức Tuấn | 2A202603902 |       | buiductuan2884-max | Nhóm trưởng |
-|   2 | Hoàng Đức An |      |       | katogithub2701 |         |
+|   2 | Hoàng Đức An | 2A202603800 | anduchoang2701@gmail.com | katogithub2701 | Thành viên |
 |   3 |        |      |       | NMCcg  |         |
 |   4 |        |      |       | VThanh-Huy |         |
 
@@ -28,16 +28,24 @@ Ví dụ: `report/team/20241234_NguyenVanAn.md`.
 
 Sao chép mục dưới đây cho từng thành viên.
 
-## HoVaTen-MSSV
+## HoangDucAn-2A202603800
 
 ### Phần việc phụ trách
 
--
+- Điều chỉnh system prompt
+
+- Điều chỉnh tool clarify, timeline, social_search
+
+- Phân tích các case lỗi
 
 ### Đóng góp cụ thể
 
--
+- Điều chỉnh system prompt trong system_prompt.md và triển khai thành version 1
+
+- Tool clarify, timeline, social_search được điều chỉnh mô tả tool và mô tả các tham số
+
+- Lập bảng thể các case lỗi, phân tích vì sao lỗi
 
 ### Bằng chứng
 
--
+- Các commit trên nhánh riêng (/hoangducan) gồm commit e5b9844, 0836b0d, 000009a, 6f844ce
