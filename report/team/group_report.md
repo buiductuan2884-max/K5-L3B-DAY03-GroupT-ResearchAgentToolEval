@@ -20,7 +20,7 @@
 
 Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc URL, tổng hợp thành digest, và gửi lên Telegram khi được xác nhận."
 
-**Cách chạy UI:**
+**Cách chạy UI:** `cd starter_v0 && pip install -r requirements.txt && streamlit run app.py`. Link dùng thử (Cloudflare quick tunnel, chỉ sống khi máy chủ nhóm đang chạy): https://coast-gray-injured-hoping.trycloudflare.com
 
 > Lệnh chạy UI (ví dụ `streamlit run app.py`) và dependency đã thêm vào `starter_v0/requirements.txt`.
 
@@ -62,10 +62,10 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 | Version | Changed Artifact | Hypothesis | Metric Before | Metric After | Run File |
 |---|---|---|---:|---:|---|
-| v0 | baseline |  |  |  |  |
-| v1 |  |  |  |  |  |
-| v2 |  |  |  |  |  |
-| v3 |  |  |  |  |  |
+| v0 | baseline |  | — | 0.65 | `runs/v0_B_base_openai_20261110T173124939840.json` |
+| v1 | system_prompt.md |  | 0.65 | 0.75 | `runs/v1_B_base_openai_20261110T183730315565.json` |
+| v2 | tools.yaml |  | 0.75 | 0.85 | `runs/v2_B_base_openai_20261110T194023990931.json` |
+| v3 | tools.yaml |  | 0.85 | 0.90 | `runs/v3_B_base_openai_20261110T220531642617.json` |
 
 ### B2. Failure Analysis
 
@@ -105,7 +105,7 @@ Lấy từ `starter_v0/transcripts/*.transcript.json`.
 |---|---|---|---|
 | Tool mới (`tools/<tên>/`) | `starter_v0/tools/deduplicate_news/` | URL chuẩn hoá và tiêu đề tương tự được gộp; không gọi API | Không tìm tin mới; chỉ gộp khi URL trùng hoặc ngưỡng từ chung đạt 0.8 |
 | Unit test tool mới (≥ 3 test/tool) | `starter_v0/tests/test_tools_todo.py` | 4 test cho URL, tiêu đề, input sai và ngưỡng sai; toàn bộ suite: 71 passed, 0 failed | 14 test TODO cũ của các tool khác vẫn skipped |
-| UI (lệnh chạy + link dùng thử) | Chưa triển khai (CP5) | — | — |
+| UI (lệnh chạy + link dùng thử) | `starter_v0/app.py`, `streamlit run app.py`, https://coast-gray-injured-hoping.trycloudflare.com | Dùng lại `run_model_tool_loop` của `chat.py`; mỗi lần gọi tool hiện args + kết quả; transcript lưu `transcripts/*_ui_*.transcript.json` | Lỗi tool/provider hiện ra (✗, `st.error`), không bị giấu; câu mẫu không có lệnh gửi |
 
 Tool unit tests: số test đã viết, và một ví dụ lỗi mà unit test bắt được nhưng eval không bắt được.
 
