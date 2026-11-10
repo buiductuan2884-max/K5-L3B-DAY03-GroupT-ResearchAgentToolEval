@@ -14,45 +14,48 @@
 
 ## 2. Mục tiêu và cách tiếp cận — PHẦN A: Giới thiệu agent
 
-### A1. Agent này làm được gì
+## A1. Agent làm được gì?
 
-> 1–2 câu mô tả agent dùng để làm gì (cho team khác hiểu nhanh).
+**Group T Research Agent** là trợ lý nghiên cứu dùng mô hình ngôn ngữ kết hợp công cụ (tool calling). Agent nhận yêu cầu bằng ngôn ngữ tự nhiên, chọn công cụ phù hợp và truyền tham số tương ứng để hỗ trợ:
 
-Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc URL, tổng hợp thành digest, và gửi lên Telegram khi được xác nhận."
+- **Tra cứu thông tin:** tìm tin tức/web, bài đăng X (Twitter) theo chủ đề hoặc tài khoản, đọc nội dung từ URL cụ thể.
+- **Nghiên cứu học thuật:** tìm bài báo trên arXiv, xem thông tin/abstract, tải PDF và trích xuất văn bản theo số trang.
+- **Tổng hợp và tra cứu nội bộ:** định dạng kết quả thành bản tin Markdown; tra cứu quy định trong kho tài liệu chính sách nội bộ.
+- **Kiểm tra yêu cầu trước khi thực hiện:** phát hiện thiếu tài khoản, URL hoặc chủ đề bằng tool nhóm `prepare_research_request`; hỏi lại khi chưa đủ thông tin.
+- **Hỗ trợ hành động ngoài hệ thống:** có tool gửi Telegram, nhưng phải được xác nhận rõ ràng trước khi gửi.
 
-**Cách chạy UI:**
+**Phạm vi và lưu ý:** Khả năng gọi công cụ trực tuyến phụ thuộc API key và tình trạng dịch vụ (Tavily, Firecrawl, RapidAPI, arXiv, Telegram). Agent không nên tự đoán dữ liệu còn thiếu. Trong lần Group Eval gần nhất, luồng xác nhận/hủy gửi Telegram vẫn còn lỗi; **không dùng gửi Telegram thật khi chưa khắc phục và kiểm tra lại chốt xác nhận**.
 
-> Lệnh chạy UI (ví dụ `streamlit run app.py`) và dependency đã thêm vào `starter_v0/requirements.txt`.
+## A2. Danh sách tool của Agent
 
-**Link dùng thử (deploy):**
-
-> Dán link public để team khác mở thử ngay. Cách deploy nhanh bằng Cloudflare Tunnel xem README. Nếu deploy Vercel/Streamlit Cloud thì dán link đó.
->
-> URL:
-
-### A2. Tool agent có
-
-> Liệt kê các tool agent đang dùng (gồm tool mới nhóm tự thêm). Mỗi tool 1 dòng: tên + làm được gì.
-
-| Tên tool | Làm được gì | Tool mới nhóm thêm? |
+| Nhóm | Tool | Công dụng chính |
 |---|---|---|
-| clarify | hỏi lại người dùng khi thiếu thông tin | không |
-|  |  |  |
-|  |  |  |
+| Core | `clarify` | Hỏi người dùng khi thiếu thông tin hoặc cần xác nhận (`text`, `yes_no`, `choice`). |
+| Core | `timeline` | Lấy bài đăng gần đây của một tài khoản X/Twitter theo `screenname` và `limit`. |
+| Core | `social_search` | Tìm bài đăng X/Twitter theo từ khóa; chọn bài mới nhất (`Latest`) hoặc phổ biến (`Top`). |
+| Core | `lookup` | Tìm web/tin tức bằng Tavily, có lọc loại tin và khoảng thời gian. |
+| Core | `fetch` | Đọc nội dung của một URL bằng Firecrawl. |
+| Core | `format` | Định dạng các mục thông tin đã thu thập thành bản tin Markdown, không tự tìm kiếm. |
+| Bonus | `policy` | Tra cứu chính sách nội bộ theo lĩnh vực: AI research, trích dẫn nguồn, bảo mật, công bố, sử dụng tool. |
+| Bonus | `papers` | Tìm bài báo arXiv theo chủ đề, số lượng và kiểu sắp xếp; trả thông tin/abstract. |
+| Bonus | `paper_text` | Tải và trích văn bản PDF arXiv theo ID/URL, số trang và giới hạn ký tự. |
+| Bonus | `send` | Gửi nội dung tới Telegram; là hành động có tác động bên ngoài, **chỉ được thực hiện sau xác nhận**. |
+| Group T | **`prepare_research_request`** | **Tool nhóm thêm:** kiểm tra và chuẩn hóa yêu cầu nghiên cứu; trả `ready`, `needs_clarification` hoặc `error` cùng bước tiếp theo, không tự tìm kiếm. |
 
-### A3. Câu hỏi mẫu để thử
+## A3. Câu hỏi mẫu để nhóm khác demo
 
-> 3–5 câu hỏi/yêu cầu mẫu để team khác tự thử agent ngay.
+| Câu hỏi gợi ý | Tool kỳ vọng |
+|---|---|
+| “Tra cứu chính sách nội bộ về bảo vệ dữ liệu cá nhân khi nghiên cứu AI.” | `policy` |
+| “Tìm đúng 3 bài báo arXiv mới được nộp gần đây nhất về RAG.” | `papers` |
+| “Đọc 2 trang đầu của bài arXiv 1706.03762.” | `paper_text` |
+| “Cho mình 5 tweet mới nhất của tài khoản Sam Altman.” | `timeline` |
+| “Tin AI nổi bật trong tuần này trên web là gì?” | `lookup` |
+| “Trước khi nghiên cứu, hãy kiểm tra yêu cầu lấy 5 tweet mới nhất nhưng mình chưa cung cấp tài khoản; chưa cần lấy tweet.” | **`prepare_research_request`** |
+| “Tóm tắt bài viết này giúp mình.” (chưa gửi URL) | `clarify` để hỏi link, không tự đoán |
 
-1.
-2.
-3.
+**Gợi ý demo:** Nếu chưa cấu hình API dịch vụ ngoài, hãy ưu tiên `policy` và `prepare_research_request`. Tránh demo gửi Telegram thật cho đến khi đã sửa và kiểm thử quy trình xác nhận/hủy.
 
-## 3. Giải pháp
-
-> Tóm tắt các thay đổi chính trong `starter_v0/artifacts/system_prompt.md` và `starter_v0/artifacts/tools.yaml`, và tool mới nhóm viết (tên, làm gì, khi nào agent nên gọi).
-
--
 
 ## 4. Kết quả — PHẦN B: Chi tiết và bằng chứng
 
