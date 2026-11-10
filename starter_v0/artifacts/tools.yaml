@@ -84,7 +84,6 @@ tools:
         headline: {type: string, default: "", description: "Tiêu đề"}
       required: [items, template]
 
-  # ---------------- Bonus tools ----------------
 # ---------------- Bonus tools ----------------
   - name: send
     description: >-
