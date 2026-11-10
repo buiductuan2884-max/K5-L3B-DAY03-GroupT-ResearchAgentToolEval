@@ -13,18 +13,15 @@
 | --: | ------ | ---- | ----- | ------ | ------- |
 |   1 | Bùi Đức Tuấn | 2A202603902 |       | buiductuan2884-max | Nhóm trưởng |
 |   2 | Hoàng Đức An | 2A202603800 | anduchoang2701@gmail.com | katogithub2701 | Thành viên |
-|   3 |        |      |       | NMCcg  |         |
+|   3 | Nguyễn Mạnh Cường    | 2A202603904     | nggmanhcuong25@gmail.com    | NMCcg  |    thành  viên     |
 |   4 |        |      |       | VThanh-Huy |         |
 
 ## Cá nhân
 
 Mỗi thành viên đồng thời tạo một báo cáo riêng trong `report/` theo dạng:
 
-```text
-report/team/MSSV_HoTen.md
-```
+report/team/2A202603904_NguyenManhCuong.md
 
-Ví dụ: `report/team/20241234_NguyenVanAn.md`.
 
 Sao chép mục dưới đây cho từng thành viên.
 
@@ -49,3 +46,16 @@ Sao chép mục dưới đây cho từng thành viên.
 ### Bằng chứng
 
 - Các commit trên nhánh riêng (/hoangducan) gồm commit e5b9844, 0836b0d, 000009a, 6f844ce
+
+## NguyenManhCuong-2A202603904
+
+### Phần việc phụ trách
+
+Cường: thực hiện công việc CP3 và CP4
+
+### Đóng góp cụ thể
+- Xây dựng 4 tools mới: DupChecker, Wiki-sum, validate_url, Date-localized
+- xây dựng 10 case single turn và mutli turn
+### Bằng chứng
+
+- lịch sử commit
