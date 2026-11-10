@@ -21,16 +21,16 @@ tools:
       type: object
       properties:
         question: {type: string, default: "", description: "Một câu hỏi ngắn, cụ thể, hỏi đúng một thông tin còn thiếu. VD: 'Bạn muốn xem báo cáo của tháng nào?'"}
-        response_type: {type: string, enum: [text, yes_no, choice], default: "text", description: "Kiểu trả lời mong đợi. text: nhập tự do (mặc định). yes_no: câu hỏi đồng ý/không. choice: chọn trong 'options' (bắt buộc kèm options)."}
+        response_type: {type: string, enum: [text, yes_no, choice], default: "text", description: "Kiểu trả lời mong đợi. text: nhập tự do (mặc định) dùng cho trả lời hoặc giải thích. yes_no: câu hỏi đồng ý/không, dùng cho việc cần xác nhận. choice: chọn trong 'options' (bắt buộc kèm options), dùng cho việc cần chọn một trong vài lựa chọn."}
         options: {type: array, default: [], items: {type: string}, description: "Chỉ dùng khi response_type='choice': 2-5 lựa chọn ngắn, không trùng nhau. Bỏ trống (hoặc []) với text và yes_no."}
-      required: [question]
+      required: [question, response_type]
 
   - name: timeline
     description: "Lấy các tweet gần đây nhất của một tài khoản X (Twitter) cụ thể, mỗi tweet gồm nội dung, link, ngày đăng và số liệu tương tác (favorites, retweets, views). Dùng khi đã biết chính xác tài khoản cần xem. KHÔNG dùng để tìm tweet theo từ khóa/chủ đề hoặc khi chưa biết tài khoản (dùng social_search hoặc clarify)."
     parameters:
       type: object
       properties:
-        screenname: {type: string, default: "", description: "Handle X của tài khoản, KHÔNG có ký tự '@', không phân biệt hoa thường. VD: 'elonmusk', không phải '@elonmusk' hay tên hiển thị."}
+        screenname: {type: string, default: "", description: "Tên đẩy đủ tài khoản X, KHÔNG có ký tự '@', không phân biệt hoa thường. VD: 'elonmusk', không phải '@elonmusk' hay tên hiển thị."}
         limit: {type: integer, default: 5, description: "Số tweet trả về, từ 1 đến 50. Mặc định 5; chỉ tăng khi người dùng yêu cầu xem nhiều hơn. Chỉ cắt bớt kết quả API, không yêu cầu API trả thêm."}
       required: [screenname]
 
