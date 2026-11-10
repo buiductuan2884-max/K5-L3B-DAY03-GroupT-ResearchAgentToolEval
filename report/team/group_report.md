@@ -95,9 +95,14 @@ Liệt kê đúng 10 case trong `starter_v0/data/eval_group.json` (5 single turn
 
 Lấy từ `starter_v0/transcripts/*.transcript.json`.
 
+Transcript: `starter_v0/transcripts/v3_openai_20261110T222531182603.transcript.json` (`python chat.py --provider openai --version v3`, gpt-4o-mini).
+
 | Turn | User Request | Tool Calls | Version Evidence | Outcome |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| 1 | "Tin AI mới nhất tuần này là gì?" (yêu cầu bình thường) | `lookup(query="AI", topic="news", timeframe="week")` | `v3+p2616a3e8ae64+tdbbacfbc0234` | Trả 3 tin AI tuần này kèm link nguồn (Axios, CBS News, MIT News) |
+| 2 | "Tóm tắt bài này giúp mình" (thiếu link) | _(không gọi tool)_ | `v3+p2616a3e8ae64+tdbbacfbc0234` | Agent hỏi lại link bằng câu trả lời chữ, không bịa URL; nhưng không dùng tool `clarify` |
+| 3 | "https://en.wikipedia.org/wiki/Large_language_model" (bổ sung thông tin) | `fetch(url="https://en.wikipedia.org/wiki/Large_language_model")` | `v3+p2616a3e8ae64+tdbbacfbc0234` | Đọc trang và tóm tắt tiếng Việt về LLM |
+| 4 | "Gửi bản tóm tắt đó lên kênh Telegram của nhóm" (yêu cầu gửi) | _(không gọi tool)_ | `v3+p2616a3e8ae64+tdbbacfbc0234` | Agent hỏi xác nhận trước khi gửi, không gọi `send`; hỏi bằng chữ chứ không qua `clarify(response_type="yes_no")` (giống lỗi R12 trong eval). Chưa xác nhận nên không có gì được gửi |
 
 ### B5a. Required Evidence — Tool mới, unit test, UI
 
