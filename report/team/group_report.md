@@ -143,7 +143,7 @@ Chỉ điền nếu nhóm làm bonus (ghi riêng, tối đa 10 điểm). Tool c�
 | Bonus | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
 | Small Local Model | xem B7 |  |  |
-| Hơn 3 tool mới (≥ 4) | `starter_v0/tools/{deduplicate_news,wiki_sum,validate_url,date_localized}/`, `tests/test_tools_todo.py` (4+3+3+3 test) | Cả 4 tool đăng ký trong `tools/__init__.py` và khai báo trong `tools.yaml`; `pytest`: 95 passed, 0 failed; base v4 giữ 0.9 | `validate_url` chỉ kiểm tra cục bộ (định dạng, domain rút gọn, blacklist `URL_BLACKLIST_DOMAINS`), không quét mã độc |
+| Hơn 3 tool mới (≥ 4) | `starter_v0/tools/{deduplicate_news,wiki_sum,validate_url,date_localized}/`, `tests/test_tools_todo.py` (4+3+3+3 test) | Cả 4 tool đăng ký trong `tools/__init__.py` và khai báo trong `tools.yaml`; `pytest`: 95 passed, 0 failed; base v4 giữ 0.9 | `validate_url` chỉ kiểm tra cục bộ (định dạng, domain rút gọn, blacklist `URL_BLACKLIST_DOMAINS`), không quét mã độc. `wiki_sum` gọi thật bị Wikipedia trả `403 Forbidden` vì request thiếu `User-Agent` (`starter_v0/tools/wiki_sum/tool.py:20-22`; bằng chứng: `tool_results` của G01, G08 trong `runs/v4_B_group_openai_20261111T000014139367.json`); unit test dùng `fake_http` nên không bắt được (leader kiểm chứng) |
 | `send` gửi thật lên Telegram sau xác nhận | transcript |  |  |
 | Test challenge (0 skipped / regression test) | `pytest` output |  |  |
 
