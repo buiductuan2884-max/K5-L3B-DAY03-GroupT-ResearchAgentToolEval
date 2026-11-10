@@ -63,9 +63,9 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 | Version | Changed Artifact | Hypothesis | Metric Before | Metric After | Run File |
 |---|---|---|---:|---:|---|
 | v0 | baseline |  | — | 0.65 | `runs/v0_B_base_openai_20261110T173124939840.json` |
-| v1 | system_prompt.md |  | 0.65 | 0.75 | `runs/v1_B_base_openai_20261110T183730315565.json` |
-| v2 | tools.yaml |  | 0.75 | 0.85 | `runs/v2_B_base_openai_20261110T194023990931.json` |
-| v3 | tools.yaml |  | 0.85 | 0.90 | `runs/v3_B_base_openai_20261110T220531642617.json` |
+| v1 | system_prompt.md | Bỏ các câu 'đừng hỏi lại / cứ gửi / chọn một tool' trong prompt, thay bằng quy tắc hỏi lại, xác nhận trước khi gửi, cho phép không gọi tool → sửa R08/R10/R11/R12/R14 | 0.65 | 0.75 | `runs/v1_B_base_openai_20261110T183730315565.json` |
+| v2 | tools.yaml | Mô tả rõ khi nào dùng/không dùng và ví dụ tham số cho 10 tool → sửa R11/R13/M02 và response_type của clarify | 0.75 | 0.85 | `runs/v2_B_base_openai_20261110T194023990931.json` |
+| v3 | tools.yaml | clarify bắt buộc response_type, yes_no cho xác nhận; sửa mô tả screenname → sửa R10/R12/M03 | 0.85 | 0.90 | `runs/v3_B_base_openai_20261110T220531642617.json` |
 
 ### B2. Failure Analysis
 
