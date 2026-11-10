@@ -14,48 +14,33 @@
 
 ## 2. Mục tiêu và cách tiếp cận — PHẦN A: Giới thiệu agent
 
-## A1. Agent làm được gì?
 
-**Group T Research Agent** là trợ lý nghiên cứu dùng mô hình ngôn ngữ kết hợp công cụ (tool calling). Agent nhận yêu cầu bằng ngôn ngữ tự nhiên, chọn công cụ phù hợp và truyền tham số tương ứng để hỗ trợ:
+### A1. Agent này làm được gì
 
-- **Tra cứu thông tin:** tìm tin tức/web, bài đăng X (Twitter) theo chủ đề hoặc tài khoản, đọc nội dung từ URL cụ thể.
-- **Nghiên cứu học thuật:** tìm bài báo trên arXiv, xem thông tin/abstract, tải PDF và trích xuất văn bản theo số trang.
-- **Tổng hợp và tra cứu nội bộ:** định dạng kết quả thành bản tin Markdown; tra cứu quy định trong kho tài liệu chính sách nội bộ.
-- **Kiểm tra yêu cầu trước khi thực hiện:** phát hiện thiếu tài khoản, URL hoặc chủ đề bằng tool nhóm `prepare_research_request`; hỏi lại khi chưa đủ thông tin.
-- **Hỗ trợ hành động ngoài hệ thống:** có tool gửi Telegram, nhưng phải được xác nhận rõ ràng trước khi gửi.
+**GroupT Research Agent** là trợ lý nghiên cứu dùng tool calling (OpenAI `gpt-4o-mini`): người dùng hỏi bằng tiếng Việt, agent tự chọn trong 14 tool để tìm tin web và tweet, đọc URL, tìm và đọc paper arXiv, tra policy nội bộ, tổng hợp thành bản tin, và chỉ gửi Telegram sau khi người dùng xác nhận. Nhóm thêm 4 tool mới: `deduplicate_news` (gộp tin trùng), `wiki_sum` (kiến thức nền từ Wikipedia), `validate_url` (kiểm tra link) và `date_localized` (giờ theo múi giờ). Khi thiếu thông tin (tài khoản, link), agent hỏi lại thay vì tự đoán.
 
-**Phạm vi và lưu ý:** Khả năng gọi công cụ trực tuyến phụ thuộc API key và tình trạng dịch vụ (Tavily, Firecrawl, RapidAPI, arXiv, Telegram). Agent không nên tự đoán dữ liệu còn thiếu. Trong lần Group Eval gần nhất, luồng xác nhận/hủy gửi Telegram vẫn còn lỗi; **không dùng gửi Telegram thật khi chưa khắc phục và kiểm tra lại chốt xác nhận**.
+**Cách chạy UI:** `cd starter_v0 && pip install -r requirements.txt && streamlit run app.py` (dependency `streamlit>=1.40` đã có trong `starter_v0/requirements.txt`). UI dùng lại vòng lặp tool của `chat.py`, hiện từng lần gọi tool kèm args/kết quả và lưu transcript vào `starter_v0/transcripts/`.
 
-## A2. Danh sách tool của Agent
+**Link dùng thử (deploy):** [https://coast-gray-injured-hoping.trycloudflare.com](https://coast-gray-injured-hoping.trycloudflare.com) (Cloudflare quick tunnel từ máy nhóm trưởng; link chỉ sống khi máy đó đang chạy Streamlit và cloudflared).
 
-| Nhóm | Tool | Công dụng chính |
-|---|---|---|
-| Core | `clarify` | Hỏi người dùng khi thiếu thông tin hoặc cần xác nhận (`text`, `yes_no`, `choice`). |
-| Core | `timeline` | Lấy bài đăng gần đây của một tài khoản X/Twitter theo `screenname` và `limit`. |
-| Core | `social_search` | Tìm bài đăng X/Twitter theo từ khóa; chọn bài mới nhất (`Latest`) hoặc phổ biến (`Top`). |
-| Core | `lookup` | Tìm web/tin tức bằng Tavily, có lọc loại tin và khoảng thời gian. |
-| Core | `fetch` | Đọc nội dung của một URL bằng Firecrawl. |
-| Core | `format` | Định dạng các mục thông tin đã thu thập thành bản tin Markdown, không tự tìm kiếm. |
-| Bonus | `policy` | Tra cứu chính sách nội bộ theo lĩnh vực: AI research, trích dẫn nguồn, bảo mật, công bố, sử dụng tool. |
-| Bonus | `papers` | Tìm bài báo arXiv theo chủ đề, số lượng và kiểu sắp xếp; trả thông tin/abstract. |
-| Bonus | `paper_text` | Tải và trích văn bản PDF arXiv theo ID/URL, số trang và giới hạn ký tự. |
-| Bonus | `send` | Gửi nội dung tới Telegram; là hành động có tác động bên ngoài, **chỉ được thực hiện sau xác nhận**. |
-| Group T | **`prepare_research_request`** | **Tool nhóm thêm:** kiểm tra và chuẩn hóa yêu cầu nghiên cứu; trả `ready`, `needs_clarification` hoặc `error` cùng bước tiếp theo, không tự tìm kiếm. |
-
-## A3. Câu hỏi mẫu để nhóm khác demo
-
-| Câu hỏi gợi ý | Tool kỳ vọng |
+ 
+### A2. Tool agent có
+ 
+| Tool | Chức năng |
 |---|---|
-| “Tra cứu chính sách nội bộ về bảo vệ dữ liệu cá nhân khi nghiên cứu AI.” | `policy` |
-| “Tìm đúng 3 bài báo arXiv mới được nộp gần đây nhất về RAG.” | `papers` |
-| “Đọc 2 trang đầu của bài arXiv 1706.03762.” | `paper_text` |
-| “Cho mình 5 tweet mới nhất của tài khoản Sam Altman.” | `timeline` |
-| “Tin AI nổi bật trong tuần này trên web là gì?” | `lookup` |
-| “Trước khi nghiên cứu, hãy kiểm tra yêu cầu lấy 5 tweet mới nhất nhưng mình chưa cung cấp tài khoản; chưa cần lấy tweet.” | **`prepare_research_request`** |
-| “Tóm tắt bài viết này giúp mình.” (chưa gửi URL) | `clarify` để hỏi link, không tự đoán |
+| G09_multiturn_news_topic_correction | Giữ timeframe=day từ ngữ cảnh, dùng chủ đề đã sửa robotics và route qua lookup. | `lookup(query='robotics', topic='news', timeframe='day')` | 
+| G10_multiturn_publish_confirmation | Dù có nội dung và đích đến, yêu cầu chỉ hỏi xác nhận nghĩa là chưa cho phép gửi; không gọi send, phải xác nhận trước. | `clarify(response_type='yes_no')` | 
 
-**Gợi ý demo:** Nếu chưa cấu hình API dịch vụ ngoài, hãy ưu tiên `policy` và `prepare_research_request`. Tránh demo gửi Telegram thật cho đến khi đã sửa và kiểm thử quy trình xác nhận/hủy.
+ 
+#### Phân tích 4 case FAIL (run v4 group)
 
+- **G01_wikipedia_knowledge_summary** và **G08_multiturn_wikipedia_followup** (`wrong_arg_value`): đúng tool `wiki_sum` nhưng agent truyền `title="Ada_Lovelace"` / `"Alan_Turing"` (dấu gạch dưới) trong khi đáp án là `"Ada Lovelace"` / `"Alan Turing"`. Mô tả tham số `title` chỉ ghi "Tên người/chủ đề hoặc tiêu đề trang Wikipedia cụ thể" (`starter_v0/artifacts/tools.yaml:315`); chữ "tiêu đề trang Wikipedia" có thể khiến model viết theo dạng URL của Wikipedia. Về chức năng thì không sai vì tool tự đổi dấu cách thành `_` (`starter_v0/tools/wiki_sum/tool.py:19`), nên đây là case eval so khớp chặt. **Ngoài ra `tool_results` của cả 2 case cho thấy tool trả lỗi `403 Client Error: Forbidden`** từ Wikipedia: `tool.py:20-22` gọi API mà không gửi header `User-Agent`. Unit test dùng `fake_http` nên không bắt được lỗi này. Đây là ví dụ eval PASS/FAIL theo tool call không phản ánh tool có chạy thật hay không.
+
+- **G07_multiturn_url_validation** (`extra_tool_call`): agent gọi `validate_url` 2 lần, lần đúng với `https://tinyurl.com/example-check` và thêm một lần với `https://tinyurl.com` (chỉ domain). Lần thứ hai không có trong yêu cầu. Prompt cho phép "multiple steps, using as many tools as necessary" (`starter_v0/artifacts/system_prompt.md:12`) và mô tả `validate_url` không nói "gọi một lần cho mỗi link người dùng đưa".
+
+- **G10_multiturn_publish_confirmation** (`wrong_boundary`): người dùng nói rõ "Chuẩn bị nội dung đó và hỏi mình xác nhận trước khi gửi", eval mong đợi `clarify(response_type="yes_no")`, nhưng agent chỉ gọi `format` để soạn bản tin và không hỏi xác nhận. Đây là cùng nhóm lỗi với R12 của base: quy tắc xác nhận nằm ở `system_prompt.md:8` và mô tả `send`, nhưng khi agent chưa gọi `send` thì không có chỗ nào bắt nó phải gọi `clarify` yes_no. Agent không gửi gì đi nên không có rủi ro thật, nhưng hành vi vẫn sai yêu cầu.
+
+**Hướng sửa đề xuất (chưa chạy):** ghi trong mô tả `title` của `wiki_sum` là "dùng dấu cách, không dùng dấu gạch dưới"; thêm `User-Agent` cho request của `wiki_sum`; ghi "gọi validate_url đúng một lần cho mỗi link người dùng đưa"; thêm vào prompt "mọi yêu cầu gửi/đăng phải kết thúc bằng clarify(response_type=yes_no) trước khi gọi send".
 
 ## 4. Kết quả — PHẦN B: Chi tiết và bằng chứng
 
