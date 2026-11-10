@@ -85,40 +85,24 @@ tools:
       required: [items, template]
 
   # ---------------- Bonus tools ----------------
-
   - name: send
-    description: >-
-      Gửi nội dung văn bản lên Telegram thông qua bot.
-      CHỈ sử dụng khi người dùng yêu cầu gửi hoặc đăng một nội dung cụ thể
-      và đã xác nhận rõ ràng việc gửi nội dung đó.
-      Nếu chưa xác nhận, phải gọi tool clarify với response_type=yes_no
-      để hỏi người dùng trước.
-      Chỉ đặt confirmed=true sau khi người dùng đã đồng ý.
-      Nếu người dùng từ chối, không được gọi send.
-      KHÔNG dùng tool này để trả lời câu hỏi thông thường,
-      tìm kiếm thông tin, giải toán, viết code hoặc xử lý yêu cầu
-      nằm ngoài phạm vi của Research Agent.
-      Không tự suy đoán rằng người dùng đã đồng ý gửi.
+    description: "Gửi một đoạn văn bản đi."
     parameters:
       type: object
       properties:
-        text:
-          type: string
-          default: ""
-          description: >-
-            Nội dung văn bản thực tế cần gửi lên Telegram.
-            Phải là nội dung mà người dùng đã yêu cầu gửi và xác nhận.
-            Không tự tạo hoặc thay đổi nội dung sau khi xác nhận.
-        confirmed:
-          type: boolean
-          default: false
-          description: >-
-            Chỉ đặt true khi người dùng đã xác nhận rõ ràng việc gửi
-            đúng nội dung này lên Telegram.
-            Nếu chưa có xác nhận hoặc người dùng từ chối,
-            phải giữ false và không thực hiện gửi.
+        text: {type: string, default: "", description: "Nội dung"}
+        confirmed: {type: boolean, default: false, description: "Cờ xác nhận"}
       required: [text]
 
+  - name: policy
+    description: "Tìm trong tài liệu nội bộ."
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Truy vấn"}
+        policy_area: {type: string, enum: [all, ai_research, source_citation, data_privacy, external_publishing, tool_usage], default: "all", description: "Nhóm"}
+        top_k: {type: integer, default: 3, description: "Số mục"}
+      required: [query]
   - name: policy
     description: >-
       Tìm kiếm và tra cứu quy định trong các tài liệu chính sách
