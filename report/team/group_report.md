@@ -16,19 +16,11 @@
 
 ### A1. Agent này làm được gì
 
-> 1–2 câu mô tả agent dùng để làm gì (cho team khác hiểu nhanh).
+**GroupT Research Agent** là trợ lý nghiên cứu dùng tool calling (OpenAI `gpt-4o-mini`): người dùng hỏi bằng tiếng Việt, agent tự chọn trong 14 tool để tìm tin web và tweet, đọc URL, tìm và đọc paper arXiv, tra policy nội bộ, tổng hợp thành bản tin, và chỉ gửi Telegram sau khi người dùng xác nhận. Nhóm thêm 4 tool mới: `deduplicate_news` (gộp tin trùng), `wiki_sum` (kiến thức nền từ Wikipedia), `validate_url` (kiểm tra link) và `date_localized` (giờ theo múi giờ). Khi thiếu thông tin (tài khoản, link), agent hỏi lại thay vì tự đoán.
 
-Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc URL, tổng hợp thành digest, và gửi lên Telegram khi được xác nhận."
+**Cách chạy UI:** `cd starter_v0 && pip install -r requirements.txt && streamlit run app.py` (dependency `streamlit>=1.40` đã có trong `starter_v0/requirements.txt`). UI dùng lại vòng lặp tool của `chat.py`, hiện từng lần gọi tool kèm args/kết quả và lưu transcript vào `starter_v0/transcripts/`.
 
-**Cách chạy UI:** `cd starter_v0 && pip install -r requirements.txt && streamlit run app.py`. Link dùng thử (Cloudflare quick tunnel, chỉ sống khi máy chủ nhóm đang chạy): https://coast-gray-injured-hoping.trycloudflare.com
-
-> Lệnh chạy UI (ví dụ `streamlit run app.py`) và dependency đã thêm vào `starter_v0/requirements.txt`.
-
-**Link dùng thử (deploy):**
-
-> Dán link public để team khác mở thử ngay. Cách deploy nhanh bằng Cloudflare Tunnel xem README. Nếu deploy Vercel/Streamlit Cloud thì dán link đó.
->
-> URL:
+**Link dùng thử (deploy):** https://coast-gray-injured-hoping.trycloudflare.com (Cloudflare quick tunnel từ máy nhóm trưởng; link chỉ sống khi máy đó đang chạy Streamlit và cloudflared).
 
 ### A2. Tool agent có
 
@@ -116,6 +108,14 @@ Run: `starter_v0/runs/v4_B_group_openai_20261111T000014139367.json` (v4, gpt-4o-
 | G08_multiturn_wikipedia_followup | Yêu cầu lượt cuối chỉ rõ nguồn Wikipedia; dùng wiki_sum cho kiến thức nền, không dùng lookup. | `wiki_sum(title='Alan Turing')` | FAIL: title: expected 'Alan Turing', got 'Alan_Turing' |
 | G09_multiturn_news_topic_correction | Giữ timeframe=day từ ngữ cảnh, dùng chủ đề đã sửa robotics và route qua lookup. | `lookup(query='robotics', topic='news', timeframe='day')` | PASS |
 | G10_multiturn_publish_confirmation | Dù có nội dung và đích đến, yêu cầu chỉ hỏi xác nhận nghĩa là chưa cho phép gửi; không gọi send, phải xác nhận trước. | `clarify(response_type='yes_no')` | FAIL: missing tool call clarify; extra tool call format |
+
+#### Phân tích 4 case FAIL (run v4 group)
+
+- **G01_wikipedia_knowledge_summary** và **G08_multiturn_wikipedia_followup** (`wrong_arg_value`): đúng tool `wiki_sum` nhưng agent truyền `title="Ada_Lovelace"` / `"Alan_Turing"` (dấu gạch dưới) trong khi đáp án là `"Ada Lovelace"` / `"Alan Turing"`. Mô tả tham số `title` chỉ ghi "Tên người/chủ đề hoặc tiêu đề trang Wikipedia cụ thể" (`starter_v0/artifacts/tools.yaml:315`); chữ "tiêu đề trang Wikipedia" có thể khiến model viết theo dạng URL của Wikipedia. Về chức năng thì không sai vì tool tự đổi dấu cách thành `_` (`starter_v0/tools/wiki_sum/tool.py:19`), nên đây là case eval so khớp chặt. **Ngoài ra `tool_results` của cả 2 case cho thấy tool trả lỗi `403 Client Error: Forbidden`** từ Wikipedia: `tool.py:20-22` gọi API mà không gửi header `User-Agent`. Unit test dùng `fake_http` nên không bắt được lỗi này. Đây là ví dụ eval PASS/FAIL theo tool call không phản ánh tool có chạy thật hay không.
+- **G07_multiturn_url_validation** (`extra_tool_call`): agent gọi `validate_url` 2 lần, lần đúng với `https://tinyurl.com/example-check` và thêm một lần với `https://tinyurl.com` (chỉ domain). Lần thứ hai không có trong yêu cầu. Prompt cho phép "multiple steps, using as many tools as necessary" (`starter_v0/artifacts/system_prompt.md:12`) và mô tả `validate_url` không nói "gọi một lần cho mỗi link người dùng đưa".
+- **G10_multiturn_publish_confirmation** (`wrong_boundary`): người dùng nói rõ "Chuẩn bị nội dung đó và hỏi mình xác nhận trước khi gửi", eval mong đợi `clarify(response_type="yes_no")`, nhưng agent chỉ gọi `format` để soạn bản tin và không hỏi xác nhận. Đây là cùng nhóm lỗi với R12 của base: quy tắc xác nhận nằm ở `system_prompt.md:8` và mô tả `send`, nhưng khi agent chưa gọi `send` thì không có chỗ nào bắt nó phải gọi `clarify` yes_no. Agent không gửi gì đi nên không có rủi ro thật, nhưng hành vi vẫn sai yêu cầu.
+
+**Hướng sửa đề xuất (chưa chạy):** ghi trong mô tả `title` của `wiki_sum` là "dùng dấu cách, không dùng dấu gạch dưới"; thêm `User-Agent` cho request của `wiki_sum`; ghi "gọi validate_url đúng một lần cho mỗi link người dùng đưa"; thêm vào prompt "mọi yêu cầu gửi/đăng phải kết thúc bằng clarify(response_type=yes_no) trước khi gọi send".
 
 ### B4. Live Chat Evidence
 
