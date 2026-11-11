@@ -5,7 +5,7 @@
 - Tên nhóm: GroupT
 - Lớp: L3B
 - Repo nhóm: `K5-L3B-DAY03-GroupT-ResearchAgentToolEval` (xem [SUBMISSION.md](SUBMISSION.md))
-- URL repo, nhánh nộp, commit chốt: https://github.com/buiductuan2884-max/K5-L3B-DAY03-GroupT-ResearchAgentToolEval, `main`, commit chốt:
+- URL repo, nhánh nộp, commit chốt: https://github.com/buiductuan2884-max/K5-L3B-DAY03-GroupT-ResearchAgentToolEval, `main`, commit chốt: `35aae4f`
 
 ## Thành viên
 
