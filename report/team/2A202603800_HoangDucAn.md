@@ -1,8 +1,4 @@
-# Báo cáo cá nhân — HoVaTen-MSSV
-
-Đổi tên file theo quy tắc `MSSV_HoTen.md`.
-
-Ví dụ: `20241234_NguyenVanAn.md`.
+# Báo cáo cá nhân — HoangDucAn-2A202603800
 
 ## 1. Thông tin thành viên
 
@@ -12,7 +8,7 @@ Ví dụ: `20241234_NguyenVanAn.md`.
 
 ## 2. Phần việc phụ trách
 
-- Điều chỉnh system prompt
+- Cải thiện system prompt
 
 - Điều chỉnh tool clarify, timeline, social_search
 
@@ -20,18 +16,20 @@ Ví dụ: `20241234_NguyenVanAn.md`.
 
 ## 3. Đóng góp cụ thể
 
-- Điều chỉnh system prompt trong system_prompt.md và triển khai thành version 1
+- Điều chỉnh system prompt trong system_prompt.md và triển khai thành version 1 -> Giảm số lỗi từ 7 còn 5
 
-- Tool clarify, timeline, social_search được điều chỉnh mô tả tool và mô tả các tham số
+- Tool clarify, timeline, social_search được điều chỉnh mô tả tool và mô tả các tham số và triển khai trên version 2
 
-- Lập bảng thể các case lỗi, phân tích vì sao lỗi
+- Tiếp tục cải thiện tool description với tool clarify để cải thiện và triển khai trên version 3 -> Giảm chỉ còn 2 lỗi
+
+- Lập bảng thể hiện các case lỗi, phân tích vì sao lỗi và đề xuất hướng giải quyết
 
 ## 4. Bằng chứng
 
 - Các commit trên nhánh riêng (/hoangducan) gồm commit e5b9844, 0836b0d, 000009a, 6f844ce
 
-- AI/công cụ đã dùng và cách tự kiểm tra kết quả: Sử dụng ChatGPT, Claude để phân tích lỗi và gợi ý điều chỉnh system prompt và tool description, kết hợp giữa đọc lỗi từ log và bài giảng để điều chỉnh kết quả
+- AI/công cụ đã dùng và cách tự kiểm tra kết quả: Sử dụng ChatGPT, Claude để phân tích lỗi và gợi ý điều chỉnh system prompt và tool description, kết hợp giữa đọc lỗi từ log và bài giảng để điều chỉnh kết quả.
 
 ## 5. Tự đánh giá
 
-Hiểu rõ cách system prompt và tool calling hoạt động. Đọc được log và phân tích lỗi, từ đó điều system prompt và tool description để giảm thiểu lỗi.
+Hiểu rõ cách system prompt và tool calling hoạt động. Đọc được log và phân tích lỗi, từ đó điều system prompt và tool description để giảm thiểu lỗi. Các phân tích về lỗi đa phần khá chính xác, khắc phục được hầu hết các lỗi
