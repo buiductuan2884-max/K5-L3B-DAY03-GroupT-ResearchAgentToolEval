@@ -94,7 +94,7 @@ Run v0: `starter_v0/runs/v0_B_base_openai_20261110T173124939840.json` (case_accu
 
 Liệt kê đúng 10 case trong `starter_v0/data/eval_group.json` (5 single turn + 5 multi turn).
 
-Run: `starter_v0/runs/v4_B_group_openai_20261111T000014139367.json` (v4, gpt-4o-mini): case_accuracy 0.6 (6/10), routing 0.8, multiturn 0.4, provider_error_cases 0.
+Run: `starter_v0/runs/v4_B_group_openai_20261111T090510008911.json` (v4, gpt-4o-mini): case_accuracy 0.6 (6/10), routing 0.8, multiturn 0.4, provider_error_cases 0.
 
 | Case ID | What It Tests | Expected Tool/Behavior | Result |
 |---|---|---|---|
@@ -102,7 +102,7 @@ Run: `starter_v0/runs/v4_B_group_openai_20261111T000014139367.json` (v4, gpt-4o-
 | G02_validate_shortened_link | Hỏi trực tiếp kiểm tra một URL → validate_url; kết quả cần được diễn giải thận trọng, không khẳng định an toàn tuyệt đối. | `validate_url(url='https://bit.ly/ai-update')` | PASS |
 | G03_direct_local_time | Hỏi trực tiếp giờ hiện tại tại thành phố → date_localized với timezone IANA; không dùng tra cứu web. | `date_localized(timezone='America/Los_Angeles')` | PASS |
 | G04_today_news_uses_lookup | Từ 'hôm nay' trong câu hỏi tìm tin yêu cầu lookup timeframe=day, không dùng date_localized. | `lookup(query='AI', topic='news', timeframe='day')` | PASS |
-| G05_specific_article_uses_fetch | Đã có URL và yêu cầu đọc/tóm tắt thì gọi fetch trực tiếp, không gọi validate_url trước. | `fetch(url='https://openai.com/research/')` | PASS |
+| G05_merge_duplicate_news_items | Người dùng đưa sẵn các tin (2 tin trùng URL sau chuẩn hoá) và chỉ yêu cầu gộp tin trùng → gọi tool mới deduplicate_news, không gọi lookup tìm tin mới và không gọi format. | `deduplicate_news()` | PASS (tool trả `item_count=2`, `duplicates_removed=1`, gộp nguồn "The Verge, Google News") |
 | G06_multiturn_time_location | Nhiều lượt làm rõ địa điểm; lượt cuối yêu cầu giờ hiện tại và phải truyền đúng timezone Tokyo. | `date_localized(timezone='Asia/Tokyo')` | PASS |
 | G07_multiturn_url_validation | Lấy URL từ lượt trước để kiểm tra ở lượt hiện tại; không fetch link. | `validate_url(url='https://tinyurl.com/example-check')` | FAIL: extra tool call validate_url |
 | G08_multiturn_wikipedia_followup | Yêu cầu lượt cuối chỉ rõ nguồn Wikipedia; dùng wiki_sum cho kiến thức nền, không dùng lookup. | `wiki_sum(title='Alan Turing')` | FAIL: title: expected 'Alan Turing', got 'Alan_Turing' |
@@ -147,7 +147,7 @@ Chỉ điền nếu nhóm làm bonus (ghi riêng, tối đa 10 điểm). Tool c�
 | Bonus | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
 | Small Local Model | Không làm | — | — |
-| Hơn 3 tool mới (≥ 4) | `starter_v0/tools/{deduplicate_news,wiki_sum,validate_url,date_localized}/`, `tests/test_tools_todo.py` (4+3+3+3 test) | Cả 4 tool đăng ký trong `tools/__init__.py` và khai báo trong `tools.yaml`; `pytest`: 95 passed, 0 failed; base v4 giữ 0.9 | `validate_url` chỉ kiểm tra cục bộ (định dạng, domain rút gọn, blacklist `URL_BLACKLIST_DOMAINS`), không quét mã độc. `wiki_sum` gọi thật bị Wikipedia trả `403 Forbidden` vì request thiếu `User-Agent` (`starter_v0/tools/wiki_sum/tool.py:20-22`; bằng chứng: `tool_results` của G01, G08 trong `runs/v4_B_group_openai_20261111T000014139367.json`); unit test dùng `fake_http` nên không bắt được (leader kiểm chứng) |
+| Hơn 3 tool mới (≥ 4) | `starter_v0/tools/{deduplicate_news,wiki_sum,validate_url,date_localized}/`, `tests/test_tools_todo.py` (4+3+3+3 test) | Cả 4 tool đăng ký trong `tools/__init__.py` và khai báo trong `tools.yaml`; mỗi tool có ít nhất 1 case group route tới (`deduplicate_news`: G05, `wiki_sum`: G01/G08, `validate_url`: G02/G07, `date_localized`: G03/G06); `pytest`: 95 passed, 0 failed; base v4 giữ 0.9 | `validate_url` chỉ kiểm tra cục bộ (định dạng, domain rút gọn, blacklist `URL_BLACKLIST_DOMAINS`), không quét mã độc. `wiki_sum` gọi thật bị Wikipedia trả `403 Forbidden` vì request thiếu `User-Agent` (`starter_v0/tools/wiki_sum/tool.py:20-22`; bằng chứng: `tool_results` của G01, G08 trong `runs/v4_B_group_openai_20261111T090510008911.json`); unit test dùng `fake_http` nên không bắt được (leader kiểm chứng) |
 | `send` gửi thật lên Telegram sau xác nhận | Không làm (chưa cấu hình `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`) | Lượt 4 trong B4: agent hỏi xác nhận, không gọi `send` | `send` từ chối khi `confirmed=false` (`tools/send/tool.py:12`) |
 | Test challenge (0 skipped / regression test) | Không làm (`pytest`: 95 passed, 14 skipped) | — | — |
 

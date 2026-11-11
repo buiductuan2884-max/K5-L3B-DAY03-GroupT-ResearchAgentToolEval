@@ -1,0 +1,828 @@
+{
+  "run_id": "v4_B_group_openai_20261111T090510008911",
+  "version": "v4",
+  "artifact_version": "v4+p832f18c0791c+tb58ba6f00ca9",
+  "prompt_hash": "832f18c0791ce661db1094de29ca7a9d13386b7a4b3fcb4f67444f14ae0f0413",
+  "tools_hash": "b58ba6f00ca9173d219f1d4ebfb105c0c9bb9891fd6d0e9394d31bb2c6241764",
+  "phase": "B",
+  "suite": "group",
+  "provider": "openai",
+  "model": "gpt-4o-mini",
+  "system_prompt": "E:\\VinUni_Codelab_Day03_Template\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "E:\\VinUni_Codelab_Day03_Template\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_group.json",
+  "dataset_id": "day03_v2_research_group",
+  "dataset_role": "group",
+  "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
+  "generated_at": "2026-11-11T09:05:10",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 6,
+    "case_accuracy": 0.6,
+    "tool_routing_accuracy": 0.8,
+    "argument_accuracy": 0.6,
+    "multiturn_accuracy": 0.4,
+    "failure_counts": {
+      "wrong_tool": 3,
+      "wrong_boundary": 1
+    },
+    "observed_mismatch_counts": {
+      "wrong_arg_value": 2,
+      "extra_tool_call": 1,
+      "missing_tool_call": 1
+    }
+  },
+  "results": [
+    {
+      "id": "G01_wikipedia_knowledge_summary",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "wiki_knowledge_baseline",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi 'X là ai?' về kiến thức nền → wiki_sum, không phải lookup tin tức."
+      },
+      "input": "Ada Lovelace là ai?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki_sum",
+            "args": {
+              "title": "Ada Lovelace"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "wiki_sum",
+            "args": {
+              "title": "Ada_Lovelace"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "title: expected 'Ada Lovelace', got 'Ada_Lovelace'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "wiki_sum",
+          "args": {
+            "title": "Ada_Lovelace"
+          },
+          "result": {
+            "tool": "wiki_sum",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://en.wikipedia.org/api/rest_v1/page/summary/Ada_Lovelace"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02_validate_shortened_link",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "validate_specific_url",
+        "difficulty": "easy",
+        "what_it_tests": "Hỏi trực tiếp kiểm tra một URL → validate_url; kết quả cần được diễn giải thận trọng, không khẳng định an toàn tuyệt đối."
+      },
+      "input": "Link https://bit.ly/ai-update này có phải link rút gọn và domain có bị chặn không?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "validate_url",
+            "args": {
+              "url": "https://bit.ly/ai-update"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "validate_url",
+            "args": {
+              "url": "https://bit.ly/ai-update"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "validate_url",
+          "args": {
+            "url": "https://bit.ly/ai-update"
+          },
+          "result": {
+            "tool": "validate_url",
+            "url": "https://bit.ly/ai-update",
+            "valid": true,
+            "is_shortened": true,
+            "is_blocked": false,
+            "blacklist_configured": false,
+            "domain": "bit.ly",
+            "reason": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "G03_direct_local_time",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "direct_localized_time",
+        "difficulty": "easy",
+        "what_it_tests": "Hỏi trực tiếp giờ hiện tại tại thành phố → date_localized với timezone IANA; không dùng tra cứu web."
+      },
+      "input": "Bây giờ ở San Francisco là mấy giờ?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "date_localized",
+            "args": {
+              "timezone": "America/Los_Angeles"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "date_localized",
+            "args": {
+              "timezone": "America/Los_Angeles"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "date_localized",
+          "args": {
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "tool": "date_localized",
+            "location": "America/Los_Angeles",
+            "timezone": "America/Los_Angeles",
+            "datetime": "2026-11-10T18:04:26-08:00",
+            "formatted": "2026-11-10 18:04:26 PST (UTC-0800)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04_today_news_uses_lookup",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "relative_date_news_routing",
+        "difficulty": "medium",
+        "what_it_tests": "Từ 'hôm nay' trong câu hỏi tìm tin yêu cầu lookup timeframe=day, không dùng date_localized."
+      },
+      "input": "Tin AI hôm nay có gì mới?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "AI",
+            "topic": "news",
+            "timeframe": "day"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AI",
+            "topic": "news",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "Super Intelligence",
+                "url": "https://www.anl.gov/si",
+                "source": "anl.gov",
+                "summary": "Super Intelligence (SI), also known as Artificial Intelligence (AI), is transforming how we advance science, strengthen national security, and drive U.S. innovation leadership. Argonne is leveraging world-class expertise and computing power to lead in the responsible development and deployment of SI. Our researchers are applying cutting-edge SI to engineer next-generation materials, fortify the nation’s energy infrastructure, speed breakthroughs in medical treatments, and automate scientific",
+                "score": 0.49318945
+              },
+              {
+                "title": "C3.ai, Inc. (AI) Stock Price, News, Quote & History - Yahoo Finance",
+                "url": "https://finance.yahoo.com/quote/AI",
+                "source": "finance.yahoo.com",
+                "summary": "| AI Q2 FY2025 earnings call transcript | 2025 | Q2 | 2024-12-09 | 2026-07-08 | 3740916 | IN_HOUSE | 228044 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2024/12/9/3740916.json |\n| AI Q1 FY2025 earnings call transcript | 2025 | Q1 | 2024-09-04 | 2026-06-27 | 2641096 | IN_HOUSE | 198847 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2024/9/4/2641096.json | [...] | AI Q4 FY2026 earnings call transcript | 2026 | Q4 | 2026-06-03 | 2026-06-27 | 3471122 | IN_HOUSE | 557460 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2026/6/3/3471122.json |\n| AI Q3 FY2026 earnings call transcript | 2026 | Q3 | 2026-02-25 | 2026-06-27 | 3232845 | IN_HOUSE | 483789 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2026/2/25/3232845.json | [...] | AI Q2 FY2026 earnings call transcript | 2026 | Q2 | 2025-12-03 | 2026-06-27 | 2506319 | IN_HOUSE | 382225 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2025/12/3/2506319.json |\n| AI Q1 FY2026 earnings call transcript | 2026 | Q1 | 2025-09-03 | 2026-06-28 | 2124314 | IN_HOUSE | 351234 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2025/9/3/2124314.json |",
+                "score": 0.3667717
+              },
+              {
+                "title": "Generative AI | Stanford HAI",
+                "url": "https://hai.stanford.edu/topics/generative-ai",
+                "source": "hai.stanford.edu",
+                "summary": "Current societal trends reflect an increased mistrust in science and a lowered civic engagement that threaten to impair research that is foundational for ensuring public health and advancing health equity. One effective countermeasure to these trends lies in community-facing citizen science applications to increase public participation in scientific research, making this field an important target for artificial intelligence (AI) exploration. We highlight potentially promising citizen science AI [...] Current societal trends reflect an increased mistrust in science and a lowered civic engagement that threaten to impair research that is foundational for ensuring public health and advancing health equity. One effective countermeasure to these trends lies in community-facing citizen science applications to increase public participation in scientific research, making this field an important target for artificial intelligence (AI) exploration. We highlight potentially promising citizen science AI",
+                "score": 0.299915
+              },
+              {
+                "title": "A New AI Tool From Google DeepMind Proved the Signal Protocol Is Secure | WIRED",
+                "url": "https://www.wired.com/story/a-new-ai-tool-from-google-deepmind-formally-verified-the-signal-protocol",
+                "source": "wired.com",
+                "summary": "The researchers say that some of their crucial advancements are in developing a “human-AI collaboration process,” as Chaudhuri puts it, that allows agents to contribute and self-correct at almost every phase of the process while still seeking human input and review at key junctures. “We don’t want this sort of vibe world where AI is generating the goals and AI is generating the proofs and basically taking tests that are self-written,\" Chaudhuri says. “There’s a middle ground.”",
+                "score": 0.28954792
+              },
+              {
+                "title": "AI Has Entered the Boardroom. Who’s Overseeing It? | Stanford Graduate School of Business",
+                "url": "https://www.gsb.stanford.edu/insights/ai-has-entered-boardroom-whos-overseeing-it",
+                "source": "gsb.stanford.edu",
+                "summary": "In interviews with Matthys, Saripalli, and their coauthors, board members across industries reported that while they are actively discussing and using AI, their boards lack a systematic approach to its governance. “In the absence of such a structure,” the researchers write, “AI may remain a recurring boardroom topic rather than become subject to meaningful oversight and accountability.” [...] AI has entered the boardroom in a big way. Directors regularly discuss the new technology, serve on dedicated AI committees, and may be recruited for their AI expertise. But how they are governing AI can be a black box. [...] In the survey, 75% of directors said they used AI for research and market analysis, 55% for board prep and material summarization. Other common uses included strategic question generation and competitive benchmarking. Matthys says that board members would ideally like to use AI “to track and summarize board packages and more quickly understand year-to-year trends by using LLM tools rather than reading 80- to 100-page reports.”",
+                "score": 0.3089721
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G05_merge_duplicate_news_items",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "dedupe_given_items_routing",
+        "difficulty": "medium",
+        "what_it_tests": "Người dùng đưa sẵn các tin (2 tin trùng URL sau chuẩn hoá) và chỉ yêu cầu gộp tin trùng → gọi tool mới deduplicate_news, không gọi lookup tìm tin mới và không gọi format."
+      },
+      "input": "Mình có 3 tin sau, gộp giúp mình các tin trùng nhau thôi, chưa cần làm bản tin:\n1. \"OpenAI ra mắt GPT-5\" - https://www.theverge.com/openai-gpt-5?utm_source=x - The Verge\n2. \"OpenAI ra mắt GPT-5\" - https://theverge.com/openai-gpt-5/ - Google News\n3. \"Google công bố Gemini 3\" - https://blog.google/gemini-3 - Google Blog",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "deduplicate_news",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "deduplicate_news",
+            "args": {
+              "items": [
+                {
+                  "title": "OpenAI ra mắt GPT-5",
+                  "url": "https://www.theverge.com/openai-gpt-5?utm_source=x",
+                  "source": "The Verge"
+                },
+                {
+                  "title": "OpenAI ra mắt GPT-5",
+                  "url": "https://theverge.com/openai-gpt-5/",
+                  "source": "Google News"
+                },
+                {
+                  "title": "Google công bố Gemini 3",
+                  "url": "https://blog.google/gemini-3",
+                  "source": "Google Blog"
+                }
+              ]
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "deduplicate_news",
+          "args": {
+            "items": [
+              {
+                "title": "OpenAI ra mắt GPT-5",
+                "url": "https://www.theverge.com/openai-gpt-5?utm_source=x",
+                "source": "The Verge"
+              },
+              {
+                "title": "OpenAI ra mắt GPT-5",
+                "url": "https://theverge.com/openai-gpt-5/",
+                "source": "Google News"
+              },
+              {
+                "title": "Google công bố Gemini 3",
+                "url": "https://blog.google/gemini-3",
+                "source": "Google Blog"
+              }
+            ]
+          },
+          "result": {
+            "tool": "deduplicate_news",
+            "items": [
+              {
+                "title": "OpenAI ra mắt GPT-5",
+                "url": "https://www.theverge.com/openai-gpt-5?utm_source=x",
+                "source": "The Verge, Google News"
+              },
+              {
+                "title": "Google công bố Gemini 3",
+                "url": "https://blog.google/gemini-3",
+                "source": "Google Blog"
+              }
+            ],
+            "item_count": 2,
+            "duplicates_removed": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "G06_multiturn_time_location",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_local_time_location",
+        "difficulty": "medium",
+        "what_it_tests": "Nhiều lượt làm rõ địa điểm; lượt cuối yêu cầu giờ hiện tại và phải truyền đúng timezone Tokyo."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Bây giờ ở đó là mấy giờ?"
+        },
+        {
+          "role": "user",
+          "content": "Ý mình là ở Tokyo."
+        },
+        {
+          "role": "user",
+          "content": "Cho mình giờ hiện tại tại Tokyo nhé."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "date_localized",
+            "args": {
+              "timezone": "Asia/Tokyo"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "date_localized",
+            "args": {
+              "timezone": "Asia/Tokyo"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "date_localized",
+          "args": {
+            "timezone": "Asia/Tokyo"
+          },
+          "result": {
+            "tool": "date_localized",
+            "location": "Asia/Tokyo",
+            "timezone": "Asia/Tokyo",
+            "datetime": "2026-11-11T11:04:44+09:00",
+            "formatted": "2026-11-11 11:04:44 JST (UTC+0900)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G07_multiturn_url_validation",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_validate_url",
+        "difficulty": "medium",
+        "what_it_tests": "Lấy URL từ lượt trước để kiểm tra ở lượt hiện tại; không fetch link."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mình có một link cần kiểm tra."
+        },
+        {
+          "role": "user",
+          "content": "https://tinyurl.com/example-check"
+        },
+        {
+          "role": "user",
+          "content": "Link này có hợp lệ và có phải link rút gọn không?"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "validate_url",
+            "args": {
+              "url": "https://tinyurl.com/example-check"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "validate_url",
+            "args": {
+              "url": "https://tinyurl.com/example-check"
+            }
+          },
+          {
+            "name": "validate_url",
+            "args": {
+              "url": "https://tinyurl.com/"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "extra_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "extra tool call validate_url"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "validate_url",
+          "args": {
+            "url": "https://tinyurl.com/example-check"
+          },
+          "result": {
+            "tool": "validate_url",
+            "url": "https://tinyurl.com/example-check",
+            "valid": true,
+            "is_shortened": true,
+            "is_blocked": false,
+            "blacklist_configured": false,
+            "domain": "tinyurl.com",
+            "reason": null
+          }
+        },
+        {
+          "tool": "validate_url",
+          "args": {
+            "url": "https://tinyurl.com/"
+          },
+          "result": {
+            "tool": "validate_url",
+            "url": "https://tinyurl.com/",
+            "valid": true,
+            "is_shortened": true,
+            "is_blocked": false,
+            "blacklist_configured": false,
+            "domain": "tinyurl.com",
+            "reason": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "G08_multiturn_wikipedia_followup",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_wiki_summary",
+        "difficulty": "medium",
+        "what_it_tests": "Yêu cầu lượt cuối chỉ rõ nguồn Wikipedia; dùng wiki_sum cho kiến thức nền, không dùng lookup."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Alan Turing là ai?"
+        },
+        {
+          "role": "user",
+          "content": "Tra cứu thêm đoạn giới thiệu Wikipedia về Alan Turing nhé."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki_sum",
+            "args": {
+              "title": "Alan Turing"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "wiki_sum",
+            "args": {
+              "title": "Alan_Turing"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "title: expected 'Alan Turing', got 'Alan_Turing'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "wiki_sum",
+          "args": {
+            "title": "Alan_Turing"
+          },
+          "result": {
+            "tool": "wiki_sum",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://en.wikipedia.org/api/rest_v1/page/summary/Alan_Turing"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G09_multiturn_news_topic_correction",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_news_topic_and_timeframe",
+        "difficulty": "hard",
+        "what_it_tests": "Giữ timeframe=day từ ngữ cảnh, dùng chủ đề đã sửa robotics và route qua lookup."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm tin AI hôm nay."
+        },
+        {
+          "role": "user",
+          "content": "Đổi chủ đề sang robotics."
+        },
+        {
+          "role": "user",
+          "content": "Chỉ tìm tin robotics, vẫn trong hôm nay."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "robotics",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "robotics",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "robotics",
+            "topic": "news",
+            "timeframe": "day"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "robotics",
+            "topic": "news",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "Gemini Robotics 2.5: Accelerating Physical Intelligence — Google DeepMind",
+                "url": "https://deepmind.google/blog/gemini-robotics-2-5-accelerates-real-world-physical-intelligence",
+                "source": "deepmind.google",
+                "summary": "Dexterity: Our robots can perform significantly more tasks with greater performance and dexterity — from using everyday tools to handling delicate, flexible objects.\n Reliability: During a real-world proof-of-concept on Mercedes-Benz production lines, our models helped Apptronik’s Apollo 2 humanoid pick and pack automotive parts with a 96% success rate. This could enable robots to take on monotonous work, to enable technicians to focus on complex build tasks. [...] Robots struggle to adapt to new unpredictable environments, our Gemini Robotics models give Apollo the ability to think, reason over multiple steps, and take action adapting to changes. In this proof-of-concept, Apollo 2 autonomously performs automotive kitting: the repetitive, physically taxing task of sorting individual parts from bulk bins into organized trays in the exact order needed for each vehicle on the line. Offloading this monotonous prep work helps keep the assembly line moving, [...] With Gemini Robotics 2.5, we expanded the model capabilities in task breadth, performance, and complexity. We evaluated the model across 200 distinct tasks — such as serving food with tongs, tying a bow on a gift box, and pipetting a liquid. These tasks represent a step toward human-level dexterity by combining a number of skills, including advanced tool use, complex manipulation of deformables, and handling delicate objects with finesse.",
+                "score": 0.60708094
+              },
+              {
+                "title": "DeepMind reveals Gemini Robotics 2.5 and open safety benchmark \"ASIMOV-jailbreak\" - Ars Technica",
+                "url": "https://arstechnica.com/google/2026/11/deepmind-reveals-gemini-robotics-2-5-and-open-safety-benchmark-asimov-jailbreak",
+                "source": "arstechnica.com",
+                "summary": "DeepMind says that Gemini Robotics 2.5 is much better at tasks that require a high degree of dexterity. The model was evaluated across more than 200 activities, including serving food with tongs and using a pipette, as you would see in a laboratory. Google also showed that Apptronik’s Apollo 2 humanoid robot with Gemini Robotics 2.5 can now tie a bow with its five-fingered hands, a notable feat, because deformable objects (like ribbon) are notoriously difficult for robots to manipulate. [...] Google DeepMind has revealed a new generation of the AI-powered Gemini Robotics platform. In the 2.5 release, Google says its robotic AI is getting tantalizingly close to completing real-world tasks as well as humans do. In fact, some Gemini robots were able to get actual work done in Mercedes-Benz factories, and the team is preparing for a day when robots operate alongside humans with an open source safety benchmark. [...] Overall, Gemini Robotics 2.5 manages a 30 to 100 percent higher success rate compared to the last version. It’s also 20 to 30 percent faster. But that’s based on laboratory testing. Google partnered with Apptronik and Mercedes-Benz to see how capable this AI is when faced with the uncertainty of the world outside robotics labs. The Gemini-powered Apollo 2 robots kitted automotive parts in a few European factories, reaching a 96 percent success rate.",
+                "score": 0.5835
+              },
+              {
+                "title": "Accelerating Experiment Design Through Super Intelligence-Driven Robotics | Department of Energy",
+                "url": "https://www.energy.gov/science/bes/articles/accelerating-experiment-design-through-super-intelligence-driven-robotics",
+                "source": "energy.gov",
+                "summary": "This work could revolutionize how scientists develop new materials. Instead of scientists spending months or years testing thousands of combinations by hand, machine learning-driven robots can find the best solutions in days to a few weeks. This advance promises to lower costs while dramatically speeding up the creation of better solar panels, computer chips, and other electronics. Researchers can also apply this system to many types of materials. As a result, it may result in discoveries that [...] Researchers built a robotic system driven by Super Intelligence (SI) that accelerates experiment design. The AutoBot replaces slow, trial-and-error methods with intelligent automation. This improvement speeds up the process of developing materials for various applications. The system analyzed more than 5,000 possible combinations for making halide perovskite materials. These materials are promising compounds for solar cells.  To accurately predict the best conditions, it needed to test fewer [...] Researchers have developed AutoBot, an automated system that combines robotics and Super Intelligence (SI) to dramatically speed up this process. AutoBot studied metal halide perovskites—promising materials for light-transforming devices such as solar cells and detectors—by testing how humidity during manufacturing affects their quality. Instead of examining all 5,000 possible combinations of temperature, process timing, and humidity, the SI system selected only the most informative",
+                "score": 0.5798168
+              },
+              {
+                "title": "Industry Insights: Google DeepMind Releases Gemini Robotics 2.5 | Association for Advancing Automation",
+                "url": "https://www.automate.org/ai/industry-insights/google-deepmind-releases-gemini-robotics-2-5",
+                "source": "automate.org",
+                "summary": "Updates include more robust dexterity, safety improvements, and a reliability metric of “96% success rate,” with Apptronik’s Apollo 2 humanoid during proof-of-concept trials on Mercedes-Benz lines at German and Hungarian factories. [...] EXPLORE NOW\n\n\"This is what we built Apollo for: useful work alongside people in real industrial settings,\" says Apptronik CEO, Jeff Cardenas. \"Pairing Apollo 2 with Gemini Robotics, we saw the models improve dramatically in just a few weeks of post-training and carry over to Mercedes-Benz production with very little drop-off. This is the foundation for bringing humanoid robots to industrial and commercial environments at scale.” [...] The system's goal is to work across embodiments. Apptronik has thus far been DeepMind's most heavily publicized humanoid manufacturer, though the team has also partnered with Agile Robotics and Boston Dynamics (the latter's most prominent team up has arrived in the form of Spot robot-based industrial inspection).\n\nFranka's FR3 Duo has also featured heavily in DeepMind Robotics' work. Along with Apollo 2, the bimanual system executed on the 200 tasks highlighted in this morning's announcement.",
+                "score": 0.5796384
+              },
+              {
+                "title": "Advancements in surgery: How AI and robotics are transforming patient outcomes at FirstHealth | BizFayetteville",
+                "url": "https://bizfayetteville.com/health-care/2026/11/10/advancements-in-surgery-how-ai-and-robotics-are-transforming-patient-outcomes-at-firsthealth/6066",
+                "source": "bizfayetteville.com",
+                "summary": "In 2024, FirstHealth adopted robotics-assisted full knee replacements and has seen measurable decreases in surgery time and faster post-surgery recovery. Most recently, at Moore Regional Hospital, FirstHealth has adopted Zimmer Biomet’s OrthoGrid Hip AI® Technology, and this is the natural next step in their plan to serve the needs of their orthopedic patients. [...] and DePuy Johnson & Johnson’s VELYS Robotic-assisted solution. These robotic systems allow surgeons to make accurate cuts within a millimeter. [...] While they have only been using the OrthoGrid Hip AI® Technology for two months, McFatter cites the measurable data points, as well as significant feedback from their orthopedic surgeons for the total knee replacement surgeries with their three robotic systems, as evidence of the benefits regarding the trend of emerging technology in orthopedics. The three robotic systems used by FirstHealth of the Carolinas are Smith+Nephew’s CORI Surgical System, Zimmer’s ROSA Knee System and DePuy Johnson &",
+                "score": 0.550698
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G10_multiturn_publish_confirmation",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_publish_confirmation",
+        "difficulty": "hard",
+        "what_it_tests": "Dù có nội dung và đích đến, yêu cầu chỉ hỏi xác nhận nghĩa là chưa cho phép gửi; không gọi send, phải xác nhận trước."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Soạn giúp mình nội dung đăng lên Telegram: Bản tin AI tuần này."
+        },
+        {
+          "role": "user",
+          "content": "Đích đến là channel Telegram của nhóm."
+        },
+        {
+          "role": "user",
+          "content": "Chuẩn bị nội dung đó và hỏi mình xác nhận trước khi gửi."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "items": [
+                {
+                  "title": "Bản tin AI tuần này",
+                  "summary": "Cập nhật những tin tức và xu hướng mới nhất trong lĩnh vực trí tuệ nhân tạo."
+                }
+              ],
+              "template": "brief"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_boundary",
+        "failures": [
+          "missing tool call clarify",
+          "extra tool call format"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "format",
+          "args": {
+            "items": [
+              {
+                "title": "Bản tin AI tuần này",
+                "summary": "Cập nhật những tin tức và xu hướng mới nhất trong lĩnh vực trí tuệ nhân tạo."
+              }
+            ],
+            "template": "brief"
+          },
+          "result": {
+            "tool": "render_digest",
+            "template": "brief",
+            "markdown": "- Cập nhật những tin tức và xu hướng mới nhất trong lĩnh vực trí tuệ nhân tạo. - ",
+            "item_count": 1
+          }
+        }
+      ]
+    }
+  ]
+}

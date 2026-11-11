@@ -39,7 +39,7 @@
 ## 4. Bằng chứng
 
 - File/commit/PR:
-  - Run: `starter_v0/runs/v0_…173124939840.json`, `v1_…183730315565.json`, `v2_…194023990931.json`, `v3_…220531642617.json`, `v4_B_base_…235953621020.json`, `v4_B_group_…000014139367.json`
+  - Run: `starter_v0/runs/v0_…173124939840.json`, `v1_…183730315565.json`, `v2_…194023990931.json`, `v3_…220531642617.json`, `v4_B_base_…235953621020.json`, `v4_B_group_…090510008911.json`
   - Transcript: `starter_v0/transcripts/v3_openai_20261110T222531182603.transcript.json`
   - UI: `starter_v0/app.py`, `starter_v0/.streamlit/config.toml`, `starter_v0/requirements.txt`
   - Commit trên `main`: `4bb6dac` (v0), `f239a1c` + `0b7cb18` (v2), `c1916d4` (sửa tên tool), `d4bfb40` (v3), `a68630d` (v4 + group), `511f239` (UI), `814a3d0` (B4), `a8d57c9` (B6)
