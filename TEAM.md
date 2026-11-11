@@ -14,7 +14,7 @@
 |   1 | Bùi Đức Tuấn | 2A202603902 |       | buiductuan2884-max | Nhóm trưởng |
 |   2 | Hoàng Đức An | 2A202603800 | anduchoang2701@gmail.com | katogithub2701 | Thành viên |
 |   3 | Nguyễn Mạnh Cường    | 2A202603904     | nggmanhcuong25@gmail.com    | NMCcg  |    thành  viên     |
-|   4 |        |      |       | VThanh-Huy |         |
+|   4 | Võ Thanh Huy | 2A202603879 |       | VThanh-Huy | Thành viên |
 
 ## Cá nhân
 
@@ -80,3 +80,20 @@ Cường: thực hiện công việc CP3 và CP4
 ### Bằng chứng
 
 - lịch sử commit
+
+## VoThanhHuy-2A202603879
+
+### Phần việc phụ trách
+
+- CP2: viết lại mô tả 4 tool `send`, `policy`, `papers`, `paper_text` trong `tools.yaml` (phần của v2)
+- Phần A báo cáo nhóm (A1) và phân tích các case FAIL của group eval (B3)
+
+### Đóng góp cụ thể
+
+- Mô tả `send` có boundary xác nhận: phải gọi `clarify` yes_no trước, chỉ đặt `confirmed=true` sau khi người dùng đồng ý, không dùng cho câu ngoài phạm vi
+- Mô tả và tham số của `policy`, `papers`, `paper_text` (khi nào dùng / không dùng, ví dụ tham số)
+- Báo cáo cá nhân `report/team/2A202603879_VoThanhHuy.md`
+
+### Bằng chứng
+
+- Commit trên `main`: `35277b4`, `7f99038`, `211c348` (tools.yaml, v2); `e54eb6f`, `8cb78c9`, `1ab7576` (báo cáo cá nhân)
