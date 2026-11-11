@@ -1,8 +1,8 @@
-# Báo cáo nhóm — Day 03 Research Agent Tool Eval
+# Báo cáo nhóm: Day 03 Research Agent Tool Eval
 
 > Báo cáo gồm 2 phần có hạn khác nhau:
-> - **Phần A (mục 2)** — giới thiệu agent, ngắn gọn 1 trang. **Xong trước Team showdown (16:30)** để team khác hiểu nhanh agent có tool gì, làm được gì. Có thể làm thêm poster `report/team/poster.html` hoặc `poster.svg`.
-> - **Phần B (mục 3–7)** — chi tiết và bằng chứng, dựa trên log thật. Hoàn thiện trước deadline nộp bài.
+> - **Phần A (mục 2):** giới thiệu agent, ngắn gọn 1 trang. **Xong trước Team showdown (16:30)** để team khác hiểu nhanh agent có tool gì, làm được gì. Có thể làm thêm poster `report/team/poster.html` hoặc `poster.svg`.
+> - **Phần B (mục 3-7):** chi tiết và bằng chứng, dựa trên log thật. Hoàn thiện trước deadline nộp bài.
 >
 > Mỗi bảng phải trỏ được tới file thật: run JSON, transcript, commit. Cách chấm xem [RUBRIC.md](../../RUBRIC.md).
 
@@ -10,9 +10,9 @@
 
 - Tên nhóm: GroupT
 - Thành viên và phân công: xem [TEAM.md](../../TEAM.md)
-- Provider/model dùng cho v0–v4: OpenAI `gpt-4o-mini` (`--provider openai`)
+- Provider/model dùng cho v0-v4: OpenAI `gpt-4o-mini` (`--provider openai`)
 
-## 2. Mục tiêu và cách tiếp cận — PHẦN A: Giới thiệu agent
+## 2. Mục tiêu và cách tiếp cận (Phần A: Giới thiệu agent)
 
 ### A1. Agent này làm được gì
 
@@ -20,7 +20,7 @@
 
 **Cách chạy UI:** `cd starter_v0 && pip install -r requirements.txt && streamlit run app.py` (dependency `streamlit>=1.40` đã có trong `starter_v0/requirements.txt`). UI dùng lại vòng lặp tool của `chat.py`, hiện từng lần gọi tool kèm args/kết quả và lưu transcript vào `starter_v0/transcripts/`.
 
-**Link dùng thử (deploy):** https://coast-gray-injured-hoping.trycloudflare.com (Cloudflare quick tunnel từ máy nhóm trưởng; link chỉ sống khi máy đó đang chạy Streamlit và cloudflared).
+**Link dùng thử (deploy):** https://unlock-hearts-cumulative-photograph.trycloudflare.com (Cloudflare quick tunnel từ máy nhóm trưởng; link chỉ sống khi máy đó đang chạy Streamlit và cloudflared).
 
 ### A2. Tool agent có
 
@@ -45,7 +45,7 @@
 
 ### A3. Câu hỏi mẫu để thử
 
-> 3–5 câu hỏi/yêu cầu mẫu để team khác tự thử agent ngay.
+> 3-5 câu hỏi/yêu cầu mẫu để team khác tự thử agent ngay.
 
 1. "Tin AI mới nhất tuần này là gì?" → `lookup`
 2. "Tóm tắt bài này giúp mình" rồi gửi link ở lượt sau → hỏi lại link, sau đó `fetch`
@@ -63,7 +63,7 @@
 - **v3, `tools.yaml`** (An): `clarify` bắt buộc `response_type` và mô tả khi nào dùng `yes_no`; sửa mô tả `screenname` của `timeline`. Base 0.85 → 0.90.
 - **v4, tool mới** (Cường, khai báo `deduplicate_news`: Tuấn): thêm `wiki_sum` (câu hỏi kiến thức nền "X là ai?"), `validate_url` (khi người dùng hỏi một link có hợp lệ/an toàn không), `date_localized` (khi hỏi trực tiếp giờ/ngày ở một nơi), khai báo trong `tools.yaml` và thêm 1 đoạn routing cho chúng trong `system_prompt.md:10`. Base giữ 0.90, group 0.60.
 
-## 4. Kết quả — PHẦN B: Chi tiết và bằng chứng
+## 4. Kết quả (Phần B: Chi tiết và bằng chứng)
 
 ### B1. Version Evidence
 
@@ -71,7 +71,7 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 | Version | Changed Artifact | Hypothesis | Metric Before | Metric After | Run File |
 |---|---|---|---:|---:|---|
-| v0 | baseline |  | — | 0.65 | `runs/v0_B_base_openai_20261110T173124939840.json` |
+| v0 | baseline |  | Không có | 0.65 | `runs/v0_B_base_openai_20261110T173124939840.json` |
 | v1 | system_prompt.md | Câu trả lời sai do thiếu các trường thông tin, nên giải quyết bằng: thiếu thông tin thì hỏi lại; gửi thì phải bắt xác nhận; được phép không gọi tool hoặc gọi nhiều bước. Khi đó 5 case (R08, R10, R11, R12, R14) sẽ pass mà không gây hỏng case routing. | 0.65 | 0.75 | `runs/v1_B_base_openai_20261110T183730315565.json` |
 | v2 | tools.yaml | Mô tả rõ ràng khi nào tool được phép sử dụng, khi nào không, kèm mô tả tham số cho 10 tool. Khi đó R11, R13, M02 sẽ pass. | 0.75 | 0.85 | `runs/v2_B_base_openai_20261110T194023990931.json` |
 | v3 | tools.yaml | Bắt buộc dùng trường response_type, dùng yes_no cho việc cần xác nhận, sửa mô tả screenname. Khi đó R10, R12, M03 sẽ pass. | 0.85 | 0.90 | `runs/v3_B_base_openai_20261110T220531642617.json` |
@@ -130,13 +130,13 @@ Transcript: `starter_v0/transcripts/v3_openai_20261110T222531182603.transcript.j
 | 3 | "https://en.wikipedia.org/wiki/Large_language_model" (bổ sung thông tin) | `fetch(url="https://en.wikipedia.org/wiki/Large_language_model")` | `v3+p2616a3e8ae64+tdbbacfbc0234` | Đọc trang và tóm tắt tiếng Việt về LLM |
 | 4 | "Gửi bản tóm tắt đó lên kênh Telegram của nhóm" (yêu cầu gửi) | _(không gọi tool)_ | `v3+p2616a3e8ae64+tdbbacfbc0234` | Agent hỏi xác nhận trước khi gửi, không gọi `send`; hỏi bằng chữ chứ không qua `clarify(response_type="yes_no")` (giống lỗi R12 trong eval). Chưa xác nhận nên không có gì được gửi |
 
-### B5a. Required Evidence — Tool mới, unit test, UI
+### B5a. Required Evidence: Tool mới, unit test, UI
 
 | Item | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
 | Tool mới (`tools/<tên>/`) | `starter_v0/tools/deduplicate_news/` | URL chuẩn hoá và tiêu đề tương tự được gộp; không gọi API | Không tìm tin mới; chỉ gộp khi URL trùng hoặc ngưỡng từ chung đạt 0.8 |
 | Unit test tool mới (≥ 3 test/tool) | `starter_v0/tests/test_tools_todo.py` | 13 test cho 4 tool mới: `deduplicate_news` 4 (URL, tiêu đề, input sai, ngưỡng sai), `wiki_sum` 3, `validate_url` 3, `date_localized` 3; toàn bộ suite: 95 passed, 0 failed | 14 test TODO mẫu của các tool có sẵn vẫn skipped |
-| UI (lệnh chạy + link dùng thử) | `starter_v0/app.py`, `streamlit run app.py`, https://coast-gray-injured-hoping.trycloudflare.com | Dùng lại `run_model_tool_loop` của `chat.py`; mỗi lần gọi tool hiện args + kết quả; transcript lưu `transcripts/*_ui_*.transcript.json` | Lỗi tool/provider hiện ra (✗, `st.error`), không bị giấu; câu mẫu không có lệnh gửi |
+| UI (lệnh chạy + link dùng thử) | `starter_v0/app.py`, `streamlit run app.py`, https://unlock-hearts-cumulative-photograph.trycloudflare.com | Dùng lại `run_model_tool_loop` của `chat.py`; mỗi lần gọi tool hiện args + kết quả; transcript lưu `transcripts/*_ui_*.transcript.json` | Lỗi tool/provider hiện ra (✗, `st.error`), không bị giấu; câu mẫu không có lệnh gửi |
 
 Tool unit tests: 13 test cho 4 tool mới (`starter_v0/tests/test_tools_todo.py`). Ví dụ unit test bắt được mà eval không bắt được: `test_deduplicate_news_returns_error_for_invalid_threshold` kiểm tra ngưỡng ngoài (0, 1] trả error dict; eval chỉ so tên tool và tham số nên không bao giờ chạy tới nhánh này. Chiều ngược lại cũng có: lỗi `403` của `wiki_sum` không unit test nào bắt (test dùng `fake_http`) và eval cũng không bắt (eval không kiểm tra nội dung tool trả về).
 
@@ -146,10 +146,10 @@ Chỉ điền nếu nhóm làm bonus (ghi riêng, tối đa 10 điểm). Tool c�
 
 | Bonus | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
-| Small Local Model | Không làm | — | — |
+| Small Local Model | Không làm | Không có | Không có |
 | Hơn 3 tool mới (≥ 4) | `starter_v0/tools/{deduplicate_news,wiki_sum,validate_url,date_localized}/`, `tests/test_tools_todo.py` (4+3+3+3 test) | Cả 4 tool đăng ký trong `tools/__init__.py` và khai báo trong `tools.yaml`; mỗi tool có ít nhất 1 case group route tới (`deduplicate_news`: G05, `wiki_sum`: G01/G08, `validate_url`: G02/G07, `date_localized`: G03/G06); `pytest`: 95 passed, 0 failed; base v4 giữ 0.9 | `validate_url` chỉ kiểm tra cục bộ (định dạng, domain rút gọn, blacklist `URL_BLACKLIST_DOMAINS`), không quét mã độc. `wiki_sum` gọi thật bị Wikipedia trả `403 Forbidden` vì request thiếu `User-Agent` (`starter_v0/tools/wiki_sum/tool.py:20-22`; bằng chứng: `tool_results` của G01, G08 trong `runs/v4_B_group_openai_20261111T090510008911.json`); unit test dùng `fake_http` nên không bắt được (leader kiểm chứng) |
 | `send` gửi thật lên Telegram sau xác nhận | Không làm (chưa cấu hình `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`) | Lượt 4 trong B4: agent hỏi xác nhận, không gọi `send` | `send` từ chối khi `confirmed=false` (`tools/send/tool.py:12`) |
-| Test challenge (0 skipped / regression test) | Không làm (`pytest`: 95 passed, 14 skipped) | — | — |
+| Test challenge (0 skipped / regression test) | Không làm (`pytest`: 95 passed, 14 skipped) | Không có | Không có |
 
 Test challenge: nhóm không làm.
 
@@ -183,7 +183,7 @@ Lỗi đặc thù của model nhỏ (đếm từ run JSON):
 
 > Khó khăn chính và cách nhóm xử lý. Nếu gặp lỗi kỹ thuật (provider lỗi, hết quota API, tool không chạy), mô tả lỗi và dẫn bằng chứng: run JSON, log, ảnh chụp.
 
-- **Provider:** không có `OPENROUTER_API_KEY`; README cho phép đổi provider nên nhóm chạy toàn bộ v0–v4 bằng OpenAI `gpt-4o-mini` (`--provider openai`).
+- **Provider:** không có `OPENROUTER_API_KEY`; README cho phép đổi provider nên nhóm chạy toàn bộ v0-v4 bằng OpenAI `gpt-4o-mini` (`--provider openai`).
 - **Windows chặn thư viện:** Windows Application Control chặn file DLL của `jiter 0.19.0` (phụ thuộc của SDK `openai`) nên không chạy được eval. Cách xử lý: cài `jiter==0.18.0` trong `.venv`.
 - **Hash artifact lệch giữa đĩa và commit:** git (`core.autocrlf=true`) đổi xuống dòng LF → CRLF khi checkout, làm `tools_hash` trên đĩa (`72a531d55085`) khác hash của run v2 (`0207b8d17077`) dù nội dung giống nhau. Cách xử lý: ghi lại file đúng byte từ commit (`git show HEAD:<file>`) và kiểm tra `versioning.file_hash` trước mỗi lần chạy eval.
 - **Merge nhánh tách từ code cũ:** các nhánh thành viên tách ra trước khi có v1/v2, diff trực tiếp với `main` trông như xoá hàng nghìn dòng. Cách xử lý: merge 3-way, chỉ gỡ đúng các đoạn xung đột (vd `send` ở v2, `social_search` ở v3, TEAM.md/`tools.yaml` ở v4) và giữ phần của từng người.
@@ -196,7 +196,7 @@ Lỗi đặc thù của model nhỏ (đếm từ run JSON):
 
 Chi tiết đóng góp của từng thành viên nằm trong [TEAM.md](../../TEAM.md) và các báo cáo cá nhân `report/team/MSSV_HoTen.md`.
 
-## 7. Hạn chế và hướng cải thiện — B6. Reflection
+## 7. Hạn chế và hướng cải thiện (B6. Reflection)
 
 Run dùng để đối chiếu: v0 `starter_v0/runs/v0_B_base_openai_20261110T173124939840.json`, v1 `…/v1_B_base_openai_20261110T183730315565.json`, v2 `…/v2_B_base_openai_20261110T194023990931.json`, v3 `…/v3_B_base_openai_20261110T220531642617.json`.
 
@@ -219,7 +219,7 @@ Ngoài ra, từ v1 `clarify` đã được gọi đúng tool mà vẫn FAIL ch�
 
 R04, M03 và B4.
 - R04 (PASS): agent gọi `fetch(url="https://openai.com/blog/gpt-5")`, nhưng `tool_results` trong run v0 và v3 cho thấy trang trả về “# 404”. Eval chỉ so tên tool và tham số (`run_eval.py:142`, `evaluate_phase_b`), không kiểm tra nội dung tool trả về.
-- M03: có thể do đáp án chặt — agent trả `screenname="andrejkarpathy"`, đáp án là `karpathy`. Để biết `andrejkarpathy` có phải tài khoản thật hay không vẫn phải kiểm tra bằng tay.
+- M03: có thể do đáp án chặt, agent trả `screenname="andrejkarpathy"`, đáp án là `karpathy`. Để biết `andrejkarpathy` có phải tài khoản thật hay không vẫn phải kiểm tra bằng tay.
 - B4: lượt 2 và 4 cho thấy agent hỏi lại bằng câu chữ, không gọi `clarify` (`starter_v0/transcripts/v3_openai_20261110T222531182603.transcript.json`). Với người dùng trực tiếp thì hành vi này ổn, nhưng eval sẽ chấm FAIL.
 
 **Nếu có thêm một vòng, nhóm sẽ thử giả thuyết nào?**

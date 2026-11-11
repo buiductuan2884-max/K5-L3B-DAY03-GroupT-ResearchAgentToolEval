@@ -31,7 +31,7 @@ Sao chép mục dưới đây cho từng thành viên.
 
 - Nhóm trưởng: fork repo, chia việc, review và merge nhánh của các thành viên vào `main`
 - CP1: chạy baseline v0 và ghi `version_log.csv`
-- CP2: viết lại mô tả `lookup`, `fetch`, `format` trong `tools.yaml` (v2); chạy eval v1–v4
+- CP2: viết lại mô tả `lookup`, `fetch`, `format` trong `tools.yaml` (v2); chạy eval v1-v4
 - CP5: UI Streamlit (`starter_v0/app.py`), link dùng thử qua Cloudflare Tunnel, chat live `chat.py` (B4)
 - Báo cáo nhóm: B1, B2 (bản nháp), B4, B6 và các mục dữ kiện
 

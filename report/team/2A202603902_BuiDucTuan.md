@@ -1,4 +1,4 @@
-# Báo cáo cá nhân — BuiDucTuan-2A202603902
+# Báo cáo cá nhân: BuiDucTuan-2A202603902
 
 ## 1. Thông tin thành viên
 
